@@ -36,6 +36,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	CString m_szStatus;
+	BOOL m_ScanInProgress = FALSE;
+	BOOL m_ScanComplete = FALSE;
 
 	CListCtrl m_List_Vir;
 	virtual BOOL OnInitDialog();
@@ -65,10 +67,7 @@ public:
 	CString m_szTemp;
 	CString GetShowSize(DOUBLE dwSize);
 	//响应子线程更新状态消息
-	LRESULT OnUpdateMyData(WPARAM wParam, LPARAM lParam)
-	{
-		return UpdateData(wParam);
-	}
+	LRESULT OnUpdateMyData(WPARAM wParam, LPARAM lParam);
 	//MD5查杀
 	BOOL MD5Scan(LPCTSTR szPath);
 	CString m_szMD5;
@@ -87,5 +86,5 @@ public:
 	MyButton_Dlg2_1 m_Button1;
 	CMyButton_Dlg2_2 m_Button2;
 	//客户端
-	void TCPClient();
+	BOOL TCPClient();
 };

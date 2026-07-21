@@ -41,12 +41,21 @@ END_MESSAGE_MAP()
 
 void CMyDialog1::OnBnClickedButton1()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	m_filelist.DeleteAllItems();
 	Fl.clear();
 	CString fl;
 	UpdateData(TRUE);
 	fl.Format(L"%s", m_fileedit);
+	if (fl.IsEmpty())
+	{
+		AfxMessageBox(_T("请先输入要扫描的目录。"));
+		return;
+	}
+	if (GetFileAttributes(fl) == INVALID_FILE_ATTRIBUTES)
+	{
+		AfxMessageBox(_T("目录不存在或无法访问。"));
+		return;
+	}
 	GetFilePath(Fl, fl);
 	CString tmpla;
 	for (int i = 0; i < Fl.size(); i++)
@@ -98,16 +107,28 @@ void CMyDialog1::GetFilePath(vector<CString>& vFilePathList, CString strDir)
 
 void CMyDialog1::OnBnClickedButton2()
 {
+	if (AfxMessageBox(_T("仅会删除已勾选的临时构建文件，是否继续？"), MB_YESNO | MB_ICONWARNING) != IDYES)
+		return;
+	DWORD removed = 0;
+	DWORD failed = 0;
 	for (int i = 0; i < Fl.size(); i++)
 	{
+		if (m_filelist.GetCheck(i) == FALSE)
+			continue;
 		LPWSTR FileSuffix = PathFindExtension(Fl[i]);
 		if (!lstrcmp(FileSuffix,L".txt")|| !lstrcmp(FileSuffix, L".tlog") || !lstrcmp(FileSuffix, L".obj") || 
 			!lstrcmp(FileSuffix, L".log") || !lstrcmp(FileSuffix, L".pch") || !lstrcmp(FileSuffix, L".ilk") ||
 			!lstrcmp(FileSuffix, L".pdb") )
 		{
-			DeleteFile(Fl[i]);
+			if (DeleteFile(Fl[i]))
+				++removed;
+			else
+				++failed;
 		}
 	}
+	CString result;
+	result.Format(_T("清理完成：删除 %u 个文件，失败 %u 个。"), removed, failed);
+	AfxMessageBox(result);
 }
 
 

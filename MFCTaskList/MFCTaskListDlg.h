@@ -47,4 +47,5 @@ public:
 //	afx_msg void OnHotKey(UINT nHotKeyId, UINT nKey1, UINT nKey2);
 
 	afx_msg void OnBnClickedButton6();
+	afx_msg void OnDestroy();
 };

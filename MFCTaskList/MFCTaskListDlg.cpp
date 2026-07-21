@@ -92,6 +92,7 @@ BEGIN_MESSAGE_MAP(CMFCTaskListDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON5, &CMFCTaskListDlg::OnBnClickedButton5)
 //	ON_WM_HOTKEY()
 ON_BN_CLICKED(IDC_BUTTON6, &CMFCTaskListDlg::OnBnClickedButton6)
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -167,7 +168,16 @@ void CMFCTaskListDlg::GetCpuState(int& nStr)
 	static LONGLONG nFreet{}, nNtt{}, nUsert{};
 	static DOUBLE nHave{};
 	GetSystemTimes((PFILETIME)&nFree, (PFILETIME)&nNt, (PFILETIME)&nUser);
-	nHave = (DOUBLE)(nFree - nFreet) / (DOUBLE)(nNt - nNtt + nUser - nUsert);
+	LONGLONG totalDelta = nNt - nNtt + nUser - nUsert;
+	if (totalDelta <= 0)
+	{
+		nStr = 0;
+		nFreet = nFree;
+		nNtt = nNt;
+		nUsert = nUser;
+		return;
+	}
+	nHave = (DOUBLE)(nFree - nFreet) / (DOUBLE)totalDelta;
 	nStr = DWORD(100.0 - nHave * 100);
 	nFreet = nFree;
 	nNtt = nNt;
@@ -299,14 +309,19 @@ void CMFCTaskListDlg::OnBnClickedButton1()
 	{
 		HANDLE hProcess = OpenProcess(PROCESS_SET_QUOTA,
 			false, dwPIDList[i]);
-		SetProcessWorkingSetSize(hProcess, -1, -1);
+		if (hProcess != NULL)
+		{
+			SetProcessWorkingSetSize(hProcess, -1, -1);
+			CloseHandle(hProcess);
+		}
 	}
 }
 
 
 void CMFCTaskListDlg::OnBnClickedButton2()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	if (MessageBox(_T("确认立即关机？未保存的工作可能丢失。"), _T("确认操作"), MB_YESNO | MB_ICONWARNING) != IDYES)
+		return;
 	//关机
 	HANDLE hToken = NULL;
 	HANDLE hProcess = GetCurrentProcess(); // 这个函数是得到当前进程的伪句柄
@@ -318,12 +333,14 @@ void CMFCTaskListDlg::OnBnClickedButton2()
 	// 调用函数提升权限
 	AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), NULL, NULL);
 	ExitWindowsEx(EWX_POWEROFF | EWX_FORCE, SHTDN_REASON_MAJOR_APPLICATION);
+	CloseHandle(hToken);
 }
 
 
 void CMFCTaskListDlg::OnBnClickedButton3()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	if (MessageBox(_T("确认立即重启？未保存的工作可能丢失。"), _T("确认操作"), MB_YESNO | MB_ICONWARNING) != IDYES)
+		return;
 	//重启
 	HANDLE hToken = NULL;
 	HANDLE hProcess = GetCurrentProcess(); // 这个函数是得到当前进程的伪句柄
@@ -335,12 +352,14 @@ void CMFCTaskListDlg::OnBnClickedButton3()
 	// 调用函数提升权限
 	AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), NULL, NULL);
 	ExitWindowsEx(EWX_REBOOT | EWX_FORCE, NULL);
+	CloseHandle(hToken);
 }
 
 
 void CMFCTaskListDlg::OnBnClickedButton4()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	if (MessageBox(_T("确认注销当前用户？未保存的工作可能丢失。"), _T("确认操作"), MB_YESNO | MB_ICONWARNING) != IDYES)
+		return;
 	//注销
 	HANDLE hToken = NULL;
 	HANDLE hProcess = GetCurrentProcess(); // 这个函数是得到当前进程的伪句柄
@@ -352,12 +371,14 @@ void CMFCTaskListDlg::OnBnClickedButton4()
 	// 调用函数提升权限
 	AdjustTokenPrivileges(hToken, FALSE, &tp, sizeof(tp), NULL, NULL);
 	ExitWindowsEx(EWX_LOGOFF | EWX_FORCE, NULL);
+	CloseHandle(hToken);
 }
 
 
 void CMFCTaskListDlg::OnBnClickedButton5()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	if (MessageBox(_T("确认让计算机进入休眠？"), _T("确认操作"), MB_YESNO | MB_ICONQUESTION) != IDYES)
+		return;
 	//休眠
 	SetSuspendState(TRUE, FALSE, FALSE);
 }
@@ -406,7 +427,8 @@ BOOL CMFCTaskListDlg::PreTranslateMessage(MSG* pMsg)
 
 void CMFCTaskListDlg::OnBnClickedButton6()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	if (MessageBox(_T("确认清空回收站？此操作无法撤销。"), _T("确认操作"), MB_YESNO | MB_ICONWARNING) != IDYES)
+		return;
 	//初始化SHQUERYRBINFO结构体
 	SHQUERYRBINFO RecycleBinInfo = {};
 	RecycleBinInfo.cbSize = sizeof(RecycleBinInfo);
@@ -414,4 +436,12 @@ void CMFCTaskListDlg::OnBnClickedButton6()
 	SHQueryRecycleBin(NULL, &RecycleBinInfo);
 	//清空回收站
 	SHEmptyRecycleBin(NULL, NULL, SHERB_NOCONFIRMATION | SHERB_NOPROGRESSUI | SHERB_NOSOUND);
+}
+
+void CMFCTaskListDlg::OnDestroy()
+{
+	KillTimer(22);
+	KillTimer(33);
+	UnregisterHotKey(GetSafeHwnd(), 0x1234);
+	CDialogEx::OnDestroy();
 }

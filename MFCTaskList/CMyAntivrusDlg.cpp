@@ -13,6 +13,30 @@ vector<CString>vecMd5;
 vector<CString>BinDuFile;
 IMPLEMENT_DYNAMIC(CMyAntivrusDlg, CDialogEx)
 
+namespace
+{
+CString GetVirusDatabasePath()
+{
+	TCHAR modulePath[MAX_PATH] = {};
+	GetModuleFileName(NULL, modulePath, MAX_PATH);
+	CString path(modulePath);
+	int separator = path.ReverseFind(_T('\\'));
+	if (separator >= 0)
+		path = path.Left(separator + 1);
+	CString database = path + _T("LocalVirBase\\Vir.ini");
+	if (GetFileAttributes(database) != INVALID_FILE_ATTRIBUTES)
+		return database;
+
+	// Visual Studio 的默认输出目录位于项目根目录的 Debug/Release 子目录。
+	if (!path.IsEmpty() && path[path.GetLength() - 1] == _T('\\'))
+		path = path.Left(path.GetLength() - 1);
+	separator = path.ReverseFind(_T('\\'));
+	if (separator >= 0)
+		return path.Left(separator + 1) + _T("LocalVirBase\\Vir.ini");
+	return database;
+}
+}
+
 CMyAntivrusDlg::CMyAntivrusDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG9, pParent)
 	, m_szStatus(_T(""))
@@ -40,6 +64,26 @@ BEGIN_MESSAGE_MAP(CMyAntivrusDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON2, &CMyAntivrusDlg::OnBnClickedButton2)
 	ON_MESSAGE(WM_MYUPDATEDATA, OnUpdateMyData)
 END_MESSAGE_MAP()
+
+LRESULT CMyAntivrusDlg::OnUpdateMyData(WPARAM, LPARAM)
+{
+	if (m_ScanComplete)
+	{
+		m_List_Vir.DeleteAllItems();
+		for (size_t i = 0; i < m_vecVirInfo.size(); ++i)
+		{
+			const VIRINFO& virus = m_vecVirInfo[i];
+			int row = m_List_Vir.InsertItem(static_cast<int>(i), virus.szVirName);
+			m_List_Vir.SetItemText(row, 1, virus.szVirPath);
+			m_List_Vir.SetItemText(row, 2, virus.szVirSize);
+		}
+		m_ScanComplete = FALSE;
+		m_ScanInProgress = FALSE;
+		GetDlgItem(IDC_BUTTON1)->EnableWindow(TRUE);
+	}
+	UpdateData(FALSE);
+	return 0;
+}
 
 
 // CMyAntivrusDlg 消息处理程序
@@ -92,6 +136,7 @@ DWORD WINAPI ScanThread(LPVOID lpVoid)
 	pScanCtrl->m_szStatus.Format(
 		_T("查 杀 完 毕 ！ 本 次 查 杀 发 现 病 毒 数 ：%d"),
 		pScanCtrl->m_vecVirInfo.size());
+	pScanCtrl->m_ScanComplete = TRUE;
 	pScanCtrl->SendMessage(WM_MYUPDATEDATA, FALSE);
 
 	return 0;
@@ -100,7 +145,8 @@ DWORD WINAPI ScanThread(LPVOID lpVoid)
 //扫描
 void CMyAntivrusDlg::OnBnClickedButton1()
 {
-	// TODO: 在此添加控件通知处理程序代码
+	if (m_ScanInProgress)
+		return;
 	//获取按钮状态
 	IsSelect[0] = ((CButton*)GetDlgItem(IDC_RADIO1))->GetCheck();
 	IsSelect[1] = ((CButton*)GetDlgItem(IDC_RADIO2))->GetCheck();
@@ -132,7 +178,6 @@ void CMyAntivrusDlg::OnBnClickedButton1()
 	m_LocalWhite.clear();
 	m_ServerMD5.clear();
 	m_ServerWhite.clear();
-	TCPClient();
 	InitSelect();
 	//开始扫描
 	StartScan();
@@ -148,13 +193,15 @@ void CMyAntivrusDlg::OnBnClickedButton2()
 		return;
 	}
 	//删除病毒
+	DWORD failures = 0;
 	for (DWORD i = 0; i < m_vecVirInfo.size(); i++)
 	{
-		DeleteFile(m_vecVirInfo[i].szVirPath);
+		if (!DeleteFile(m_vecVirInfo[i].szVirPath))
+			++failures;
 	}
 	m_vecVirInfo.clear();
 	m_List_Vir.DeleteAllItems();
-	m_szStatus = _T("清 除 病 毒 完 毕 !");
+	m_szStatus.Format(_T("清除完成：%u 个文件删除失败。"), failures);
 	UpdateData(FALSE);
 }
 
@@ -247,7 +294,7 @@ void CMyAntivrusDlg::StartScan()
 			GetPrivateProfileString(_T("Num"),
 				_T("MD5"), _T("DefaultName"),
 				Temp.GetBuffer(MAX_PATH), MAX_PATH,
-				_T(".\\LocalVirBase\\Vir.ini"));
+				GetVirusDatabasePath());
 			Temp.ReleaseBuffer();
 			int n = _ttoi(Temp);
 			//再根据个数遍历MD5信息，加载到Vector
@@ -258,7 +305,7 @@ void CMyAntivrusDlg::StartScan()
 				GetPrivateProfileString(_T("MD5"),
 					tempCount, _T("DefaultName"),
 					Temp.GetBuffer(MAX_PATH), MAX_PATH,
-					_T(".\\LocalVirBase\\Vir.ini"));
+					GetVirusDatabasePath());
 				Temp.ReleaseBuffer();
 				m_LocalMD5.push_back(Temp);
 			}
@@ -277,7 +324,7 @@ void CMyAntivrusDlg::StartScan()
 			GetPrivateProfileString(_T("Num"),
 				_T("White"), _T("DefaultName"),
 				Temp.GetBuffer(MAX_PATH), MAX_PATH,
-				_T(".\\LocalVirBase\\Vir.ini"));
+				GetVirusDatabasePath());
 			Temp.ReleaseBuffer();
 			int n = _ttoi(Temp);
 			//在根据个数遍历MD5信息，加载到Vector
@@ -288,7 +335,7 @@ void CMyAntivrusDlg::StartScan()
 				GetPrivateProfileString(_T("White"),
 					tempCount, _T("DefaultName"),
 					Temp.GetBuffer(MAX_PATH), MAX_PATH,
-					_T(".\\LocalVirBase\\Vir.ini"));
+					GetVirusDatabasePath());
 				Temp.ReleaseBuffer();
 				m_LocalWhite.push_back(Temp);
 			}
@@ -303,6 +350,14 @@ void CMyAntivrusDlg::StartScan()
 	//如果是云端，再判断是MD5还是黑名单，下载云端病毒库信息
 	else
 	{
+		m_szStatus = _T("正在连接云端规则服务...");
+		UpdateData(FALSE);
+		if (!TCPClient())
+		{
+			m_szStatus = _T("无法连接云端规则服务，扫描未启动。");
+			UpdateData(FALSE);
+			return;
+		}
 		if (IsMD5)
 		{
 			//云端MD5	加载云端MD5病毒库
@@ -334,9 +389,27 @@ void CMyAntivrusDlg::StartScan()
 			//m_ServerWhite = m_ServerObj.RetVector();
 		}
 	}
+	if ((IsMD5 && (IsLocal ? m_LocalMD5.empty() : m_ServerMD5.empty())) ||
+		(!IsMD5 && (IsLocal ? m_LocalWhite.empty() : m_ServerWhite.empty())))
+	{
+		m_szStatus = _T("规则库为空，扫描未启动。");
+		UpdateData(FALSE);
+		return;
+	}
+
 	//3.创建启动扫描线程
 	//根据以上四项，调用主线程中的函数进行查杀，将结果保存在主线程的Vector中
-	CloseHandle(CreateThread(NULL, 0, ScanThread, this, 0, NULL));
+	m_ScanInProgress = TRUE;
+	HANDLE scanThread = CreateThread(NULL, 0, ScanThread, this, 0, NULL);
+	if (scanThread == NULL)
+	{
+		m_ScanInProgress = FALSE;
+		m_szStatus = _T("无法创建扫描线程。");
+		UpdateData(FALSE);
+		return;
+	}
+	GetDlgItem(IDC_BUTTON1)->EnableWindow(FALSE);
+	CloseHandle(scanThread);
 }
 
 
@@ -379,7 +452,10 @@ void CMyAntivrusDlg::Scan_Single(LPCTSTR szPath)
 	DWORD dwAttributes = 0;
 
 	sFindFilter = szPath;
-	FindFirstFile(sFindFilter, &wfd);
+	HANDLE hFind = FindFirstFile(sFindFilter, &wfd);
+	if (hFind == INVALID_HANDLE_VALUE || (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+		return;
+	FindClose(hFind);
 
 	//判断是否是病毒
 	if (IsMD5)
@@ -387,11 +463,6 @@ void CMyAntivrusDlg::Scan_Single(LPCTSTR szPath)
 		//MD5查杀
 		if (MD5Scan(szPath))
 		{
-			//插入List
-			m_List_Vir.InsertItem(0, wfd.cFileName);	//文件名
-			m_List_Vir.SetItemText(0, 1, szPath);		//文件路径
-			m_List_Vir.SetItemText(0, 2,				//文件大小
-				GetShowSize(wfd.nFileSizeLow));
 			//保存到Vector
 			VIRINFO VirInfo;
 			_tcscpy_s(VirInfo.szVirName, wfd.cFileName);
@@ -406,11 +477,6 @@ void CMyAntivrusDlg::Scan_Single(LPCTSTR szPath)
 		//如果是病毒 将文件信息保存到病毒Vector
 		if (WhiteScan(szPath))
 		{
-			//插入List
-			m_List_Vir.InsertItem(0, wfd.cFileName);	//文件名
-			m_List_Vir.SetItemText(0, 1, szPath);		//文件路径
-			m_List_Vir.SetItemText(0, 2,				//文件大小
-				GetShowSize(wfd.nFileSizeLow));
 			//保存到Vector
 			VIRINFO VirInfo;
 			_tcscpy_s(VirInfo.szVirName, wfd.cFileName);
@@ -451,7 +517,8 @@ void CMyAntivrusDlg::Scam_All(LPCTSTR szPath)
 		//如果当前路径是文件夹，则需要递归文件夹中的文件
 		if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 		{
-			Scam_All(sFullPath);
+			if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) == 0)
+				Scam_All(sFullPath);
 		}
 		//否则，这是一个文件
 		else
@@ -467,11 +534,6 @@ void CMyAntivrusDlg::Scam_All(LPCTSTR szPath)
 				//如果是病毒 将文件信息保存到病毒Vector
 				if (MD5Scan(sFullPath))
 				{
-					//插入List中显示
-					m_List_Vir.InsertItem(0, wfd.cFileName);	//文件名
-					m_List_Vir.SetItemText(0, 1, sFullPath);	//文件路径
-					m_List_Vir.SetItemText(0, 2,				//文件大小
-						GetShowSize(wfd.nFileSizeLow));
 					//保存病毒信息到Vector容器
 					VIRINFO VirInfo;
 					_tcscpy_s(VirInfo.szVirName, wfd.cFileName);
@@ -486,11 +548,6 @@ void CMyAntivrusDlg::Scam_All(LPCTSTR szPath)
 				//如果是病毒 将文件信息保存到病毒Vector
 				if (WhiteScan(sFullPath))
 				{
-					//插入List中显示
-					m_List_Vir.InsertItem(0, wfd.cFileName);	//文件名
-					m_List_Vir.SetItemText(0, 1, sFullPath);	//文件路径
-					m_List_Vir.SetItemText(0, 2,				//文件大小
-						GetShowSize(wfd.nFileSizeLow));
 					//保存病毒信息到Vector容器
 					VIRINFO VirInfo;
 					_tcscpy_s(VirInfo.szVirName, wfd.cFileName);
@@ -527,7 +584,7 @@ CString CMyAntivrusDlg::GetShowSize(DOUBLE dwSize)
 		//MB
 		szSize.Format(_T("%.2f MB"), (DOUBLE)dwSize / 1024 / 1024);
 		return szSize;
-	}if (dwSize > 1024 * 1024 * 1024)
+	}else
 	{
 		//GB
 		szSize.Format(_T("%.2f GB"), (DOUBLE)dwSize / 1024 / 1024 / 1024);
@@ -542,10 +599,17 @@ BOOL CMyAntivrusDlg::MD5Scan(LPCTSTR szPath)
 {
 	//LPCTSTR 转CHAR*
 	int num = WideCharToMultiByte(CP_OEMCP, NULL, szPath, -1, NULL, 0, NULL, FALSE);
+	if (num <= 1)
+		return FALSE;
 	char* pchar = new char[num];
 	WideCharToMultiByte(CP_OEMCP, NULL, szPath, -1, pchar, num, NULL, FALSE);
 	//获取MD5值
 	char* md5 = md5FileValue(pchar);
+	if (md5 == NULL || md5[0] == '\0')
+	{
+		delete[] pchar;
+		return FALSE;
+	}
 	//CHAR* 转LPCTSTR
 	num = MultiByteToWideChar(0, 0, md5, -1, NULL, 0);
 	wchar_t* wide = new wchar_t[num];
@@ -594,10 +658,9 @@ BOOL CMyAntivrusDlg::WhiteScan(LPCTSTR szPath)
 		//本地黑名单查杀		与m_LocalWhite作对比
 		for (DWORD i = 0; i < m_LocalWhite.size(); i++)
 		{
-			if (m_LocalWhite[i] == szPath)
+			if (m_LocalWhite[i].CompareNoCase(szPath) == 0)
 			{
-				//是病毒 返回真
-				return FALSE;
+				return TRUE;
 			}
 		}
 	}
@@ -606,18 +669,17 @@ BOOL CMyAntivrusDlg::WhiteScan(LPCTSTR szPath)
 		//云端MD5查杀		与m_ServerWhite作对比
 		for (DWORD i = 0; i < m_ServerWhite.size(); i++)
 		{
-			if (m_ServerWhite[i] == szPath)
+			if (m_ServerWhite[i].CompareNoCase(szPath) == 0)
 			{
-				//是病毒 返回真
-				return FALSE;
+				return TRUE;
 			}
 		}
 	}
-	return TRUE;
+	return FALSE;
 }
 
 //客户端
-void CMyAntivrusDlg::TCPClient()
+BOOL CMyAntivrusDlg::TCPClient()
 {
 	//1. 初始化Winsock库
 	WORD wVersion = 0;//要使用的库的版本
@@ -626,7 +688,7 @@ void CMyAntivrusDlg::TCPClient()
 	int nSuccess = WSAStartup(wVersion, &wsd);
 	if (nSuccess != 0)
 	{
-		printf("初始化失败，从新运行");
+		return FALSE;
 	}
 	//2. 创建一个socket用于连接服务端
 	SOCKET ConnectSocket = socket(
@@ -634,17 +696,30 @@ void CMyAntivrusDlg::TCPClient()
 		SOCK_STREAM,
 		IPPROTO_TCP
 	);
+	if (ConnectSocket == INVALID_SOCKET)
+	{
+		WSACleanup();
+		return FALSE;
+	}
+	DWORD timeout = 3000;
+	setsockopt(ConnectSocket, SOL_SOCKET, SO_RCVTIMEO, reinterpret_cast<const char*>(&timeout), sizeof(timeout));
+	setsockopt(ConnectSocket, SOL_SOCKET, SO_SNDTIMEO, reinterpret_cast<const char*>(&timeout), sizeof(timeout));
 	//3. 主动连接服务端
 	sockaddr_in addrin = { 0 };
 	addrin.sin_family = AF_INET;//使用的协议族
 	//主机字节序转网络字节序：小端转大端
 	addrin.sin_port = htons(1234); //端口号
 	addrin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
-	connect(
+	if (connect(
 		ConnectSocket,
 		(sockaddr*)&addrin,
 		sizeof(sockaddr_in)
-	);
+	) == SOCKET_ERROR)
+	{
+		closesocket(ConnectSocket);
+		WSACleanup();
+		return FALSE;
+	}
 
 	//4. 开始收发数据
 	char buf[40] = { 0 };
@@ -658,12 +733,25 @@ void CMyAntivrusDlg::TCPClient()
 	//int count = (int)buff;
 	//send(ConnectSocket, "1", 10, 0);
 
-	recv(ConnectSocket, buf, 40, 0);
-	recv(ConnectSocket, buf1, 40, 0);
-	recv(ConnectSocket, buf2, 40, 0);
-	recv(ConnectSocket, buf_black, 40, 0);
-	recv(ConnectSocket, buf_black1, 40, 0);
-	recv(ConnectSocket, buf_black2, 40, 0);
+	auto receiveRecord = [ConnectSocket](char* destination) -> BOOL
+	{
+		int received = 0;
+		while (received < 40)
+		{
+			int result = recv(ConnectSocket, destination + received, 40 - received, 0);
+			if (result <= 0)
+				return FALSE;
+			received += result;
+		}
+		return TRUE;
+	};
+	if (!receiveRecord(buf) || !receiveRecord(buf1) || !receiveRecord(buf2) ||
+		!receiveRecord(buf_black) || !receiveRecord(buf_black1) || !receiveRecord(buf_black2))
+	{
+		closesocket(ConnectSocket);
+		WSACleanup();
+		return FALSE;
+	}
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -680,26 +768,30 @@ void CMyAntivrusDlg::TCPClient()
 		buff[i] = buf2[i];
 	}
 	m_ServerMD5.push_back(buff);
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < 39; i++)
 	{
 		buff_Black[i] = buf_black[i];
 	}
+	buff_Black[39] = _T('\0');
 	m_ServerWhite.push_back(buff_Black);
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < 39; i++)
 	{
 		buff_Black[i] = buf_black1[i];
 	}
+	buff_Black[39] = _T('\0');
 	m_ServerWhite.push_back(buff_Black);
-	for (int i = 0; i < 40; i++)
+	for (int i = 0; i < 39; i++)
 	{
 		buff_Black[i] = buf_black2[i];
 	}
+	buff_Black[39] = _T('\0');
 	m_ServerWhite.push_back(buff_Black);
 
 	//printf("接到的数据为%s", buf);
 	//5. 结束
 	closesocket(ConnectSocket);
 	WSACleanup();
+	return TRUE;
 }
 
 
