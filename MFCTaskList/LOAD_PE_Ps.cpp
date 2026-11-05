@@ -108,8 +108,14 @@ void LOAD_PE_Ps::get_file_header_information(char* buff)
 	AddressOfEntryPoint.Format(L"AddressOfEntryPoint：%x\r\n", optional_head->AddressOfEntryPoint);
 	//代码区块的起始RVA
 	BaseOfCode.Format(L"BaseOfCode：%x\r\n", optional_head->BaseOfCode);
-	//数据区块的起始RVA
-	BaseOfData.Format(L"BaseOfData：%x\r\n", optional_head->BaseOfData);
+	//数据区块的起始RVA（BaseOfData 仅存在于 PE32 的 OptionalHeader，PE32+ 没有该字段）
+	if (optional_head->Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+		PIMAGE_OPTIONAL_HEADER32 optional_head32 = reinterpret_cast<PIMAGE_OPTIONAL_HEADER32>(optional_head);
+		BaseOfData.Format(L"BaseOfData：%x\r\n", optional_head32->BaseOfData);
+	}
+	else {
+		BaseOfData.Format(L"BaseOfData：N/A(PE32+)\r\n");
+	}
 	//镜像基址
 	ImageBase.Format(L"ImageBase：%x\r\n", optional_head->ImageBase);
 	//内存的对齐粒度
