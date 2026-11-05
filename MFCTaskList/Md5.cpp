@@ -82,7 +82,7 @@ unsigned int conv(unsigned int a)
 MD5VAL md5(char* str, unsigned int size)
 {
 	if (size == 0)
-		size = strlen(str);
+		size = (unsigned int)strlen(str);
 	unsigned int m = size % 64;
 	unsigned int lm = size - m;  //数据整块长度
 	unsigned int ln;  //数据补位后长度
@@ -96,7 +96,7 @@ MD5VAL md5(char* str, unsigned int size)
 	for (i = 0; i < size; i++)
 		strw[i] = str[i];
 	//补位
-	strw[i++] = 0x80;
+	strw[i++] = (char)0x80;
 	for (i; i < ln - 8; i++)
 		strw[i] = 0x00;
 	//补长度
@@ -206,14 +206,14 @@ MD5VAL md5File(FILE* fpin)
 	i = 0;
 	do
 	{
-		count = fread(buf, 1, BUFFER_SIZE, fpin);
+		count = (unsigned int)fread(buf, 1, BUFFER_SIZE, fpin);
 		i += count;
 		if (count == BUFFER_SIZE)
 			co = BUFFER_SIZE;
 		else
 		{
 			j = count;
-			buf[j++] = 0x80;
+			buf[j++] = (char)0x80;
 			for (j; j % 64 != 56; j++)
 				buf[j] = 0x00;
 			*(unsigned int*)(buf + j) = i << 3; j += 4;
@@ -325,7 +325,7 @@ char* md5FileValue(char* fname)
 void md5Str(char* input, char* output)
 {
 	MD5VAL val;
-	val = md5(input, strlen(input));
+	val = md5(input, (unsigned int)strlen(input));
 	sprintf(output, "%08x%08x%08x%08x", conv(val.a), conv(val.b), conv(val.c), conv(val.d));
 
 }

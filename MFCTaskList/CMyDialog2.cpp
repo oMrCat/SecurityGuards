@@ -1,4 +1,4 @@
-ï»¿ // CMyDialog2.cpp: å®ç°æ–‡ä»¶
+ // CMyDialog2.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 #include<iostream>
 
-// CMyDialog2 å¯¹è¯æ¡†
+// CMyDialog2 ¶Ô»°¿ò
 vector<CString>m_Filebuff;
 vector<CString>m_Filebuff1;
 vector<CString>m_Filebuff2;
@@ -40,27 +40,27 @@ BEGIN_MESSAGE_MAP(CMyDialog2, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CMyDialog2 æ¶ˆæ¯å¤„ç†ç¨‹åº
+// CMyDialog2 ÏûÏ¢´¦Àí³ÌĞò
 void EnumFile(const TCHAR* szPath)
 {
 	CString fn;
 	CString fs;
 	CString ft;
 	WIN32_FIND_DATA  wfd = {};
-	setlocale(LC_ALL, "CHS"); // è®¾ç½®å­—ç¬¦ç¼–ç æ ¼å¼
-	//æ‰¾åˆ°ç¬¬ä¸€ä¸ªæ–‡ä»¶
+	setlocale(LC_ALL, "CHS"); // ÉèÖÃ×Ö·û±àÂë¸ñÊ½
+	//ÕÒµ½µÚÒ»¸öÎÄ¼ş
 	TCHAR szDirtoryPath[MAX_PATH] = { 0 };
 	_stprintf_s(szDirtoryPath, _T("%s\\%s"), szPath, _T("*"));
 	HANDLE hFindFile = FindFirstFile(szDirtoryPath, &wfd);
 	if (hFindFile != INVALID_HANDLE_VALUE) {
 		do {
 			fn.Format(TEXT("%s:  \n"), wfd.cFileName);
-			fs.Format(L"æ–‡ä»¶å¤§å°ä¸º:%då­—èŠ‚  ", wfd.nFileSizeLow);
+			fs.Format(L"ÎÄ¼ş´óĞ¡Îª:%d×Ö½Ú  ", wfd.nFileSizeLow);
 			FILETIME  Time = { 0 };
 			FileTimeToLocalFileTime(&wfd.ftCreationTime, &Time);
 			SYSTEMTIME sysTime = { 0 };
 			FileTimeToSystemTime(&Time, &sysTime);
-			ft.Format(L"åˆ›å»ºæ—¶é—´:%då¹´%dæœˆ%dæ—¥%dæ—¶%dåˆ†%dç§’\n",
+			ft.Format(L"´´½¨Ê±¼ä:%dÄê%dÔÂ%dÈÕ%dÊ±%d·Ö%dÃë\n",
 				sysTime.wYear,
 				sysTime.wMonth, sysTime.wDay, sysTime.wHour,
 				sysTime.wMinute, sysTime.wSecond);
@@ -75,12 +75,12 @@ void CMyDialog2::FileAttribute()
 {
 	CRect rc = {};
 	m_filelist.GetClientRect(&rc);
-	// é€šè¿‡è°ƒç”¨ InsertColumn å‡½æ•°æ·»åŠ åˆ—
-	m_filelist.InsertColumn(0, _T("åºå·"), 0, rc.right / 5);
-	m_filelist.InsertColumn(1, _T("æ–‡ä»¶åç§°"), 0, rc.right / 5);
-	m_filelist.InsertColumn(2, _T("æ–‡ä»¶å¤§å°"), 0, rc.right / 5);
-	m_filelist.InsertColumn(3, _T("æ–‡ä»¶åˆ›å»ºæ—¶é—´"), 0, rc.right / 5);
-	m_filelist.InsertColumn(4, _T("æ–‡ä»¶å±æ€§"), 0, rc.right / 5);
+	// Í¨¹ıµ÷ÓÃ InsertColumn º¯ÊıÌí¼ÓÁĞ
+	m_filelist.InsertColumn(0, _T("ĞòºÅ"), 0, rc.right / 5);
+	m_filelist.InsertColumn(1, _T("ÎÄ¼şÃû³Æ"), 0, rc.right / 5);
+	m_filelist.InsertColumn(2, _T("ÎÄ¼ş´óĞ¡"), 0, rc.right / 5);
+	m_filelist.InsertColumn(3, _T("ÎÄ¼ş´´½¨Ê±¼ä"), 0, rc.right / 5);
+	m_filelist.InsertColumn(4, _T("ÎÄ¼şÊôĞÔ"), 0, rc.right / 5);
 	m_filelist.SetExtendedStyle(LVS_EX_CHECKBOXES |
 		LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 	
@@ -101,14 +101,14 @@ void CMyDialog2::OnBnClickedButton2()
 	m_filelist.DeleteAllItems();
 	static int index = 0;
 	CString temp2;
-	for (int i = 0; i < m_Filebuff.size(); i++)
+	for (DWORD i = 0; i < m_Filebuff.size(); i++)
 	{
 		if (m_Filebuff[i].GetLength() != 0)
 		{
 			temp2.Format(_T("%d"), i);
-			// é€šè¿‡ InsertItem å‡½æ•°æ·»åŠ è¡Œ
+			// Í¨¹ı InsertItem º¯ÊıÌí¼ÓĞĞ
 			m_filelist.InsertItem(i, temp2);
-			// é€šè¿‡ SetItemText å‡½æ•°ç»™æ¯ä¸€è¡Œè®¾ç½®å†…å®¹
+			// Í¨¹ı SetItemText º¯Êı¸øÃ¿Ò»ĞĞÉèÖÃÄÚÈİ
 			m_filelist.SetItemText(i, 1, m_Filebuff[i]);
 			m_filelist.SetItemText(i, 2, m_Filebuff1[i]);
 			m_filelist.SetItemText(i, 3, m_Filebuff2[i]);
@@ -116,12 +116,12 @@ void CMyDialog2::OnBnClickedButton2()
 		}
 	}
 
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 }
 
 void CMyDialog2::OnBnClickedButton1()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	m_Filebuff.clear();
 	m_Filebuff1.clear();
 	m_Filebuff2.clear();
@@ -130,14 +130,14 @@ void CMyDialog2::OnBnClickedButton1()
 	EnumFile(_T("D:"));
 	static int index = 0;
 	CString temp1;
-	for (int i = 0; i < m_Filebuff.size(); i++)
+	for (DWORD i = 0; i < m_Filebuff.size(); i++)
 	{
 		if (m_Filebuff[i].GetLength() != 0)
 		{
 			temp1.Format(_T("%d"), i);
-			// é€šè¿‡ InsertItem å‡½æ•°æ·»åŠ è¡Œ
+			// Í¨¹ı InsertItem º¯ÊıÌí¼ÓĞĞ
 			m_filelist.InsertItem(i, temp1);
-			// é€šè¿‡ SetItemText å‡½æ•°ç»™æ¯ä¸€è¡Œè®¾ç½®å†…å®¹
+			// Í¨¹ı SetItemText º¯Êı¸øÃ¿Ò»ĞĞÉèÖÃÄÚÈİ
 			m_filelist.SetItemText(i, 1, m_Filebuff[i]);
 			m_filelist.SetItemText(i, 2, m_Filebuff1[i]);
 			m_filelist.SetItemText(i, 3, m_Filebuff2[i]);
@@ -150,8 +150,8 @@ BOOL CMyDialog2::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–
+	// TODO:  ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯
 	FileAttribute();
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // å¼‚å¸¸: OCX å±æ€§é¡µåº”è¿”å› FALSE
+				  // Òì³£: OCX ÊôĞÔÒ³Ó¦·µ»Ø FALSE
 }

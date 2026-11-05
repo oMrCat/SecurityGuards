@@ -1,4 +1,4 @@
-ï»¿// CMyDialog.cpp: å®ç°æ–‡ä»¶
+// CMyDialog.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -6,7 +6,7 @@
 #include "CMyDialog.h"
 #include "afxdialogex.h"
 
-// CMyDialog å¯¹è¯æ¡†
+// CMyDialog ¶Ô»°¿ò
 vector<CString>m_buff;
 IMPLEMENT_DYNAMIC(CMyDialog, CDialogEx)
 
@@ -28,13 +28,13 @@ void CMyDialog::DoDataExchange(CDataExchange* pDX)
 
 BOOL CALLBACK EnumWinProc(HWND hWnd, LPARAM lParam)
 {
-	//æ ¹æ®çª—å£å¥æŸ„è·å–çª—å£å
+	//¸ù¾İ´°¿Ú¾ä±ú»ñÈ¡´°¿ÚÃû
 	TCHAR buff[200] = {};
-	GetWindowText(hWnd, buff, 200);//å¾—åˆ°çª—å£åï¼Œå¯æ˜¾ç¤ºåˆ°ç•Œé¢ä¸­
-	//åˆ¤æ–­çª—å£æ˜¯å¦è¢«éšè—
+	GetWindowText(hWnd, buff, 200);//µÃµ½´°¿ÚÃû£¬¿ÉÏÔÊ¾µ½½çÃæÖĞ
+	//ÅĞ¶Ï´°¿ÚÊÇ·ñ±»Òş²Ø
 	if (IsWindowVisible(hWnd) == TRUE && wcslen(buff) != 0)
 	{
-		//çª—å£æ²¡æœ‰è¢«éšè—ä¸”çª—å£æ ‡é¢˜é•¿åº¦ä¸ä¸º0ï¼Œåˆ™å°†çª—å£ä¿¡æ¯æ˜¾ç¤ºåˆ°ç•Œé¢ä¸­
+		//´°¿ÚÃ»ÓĞ±»Òş²ØÇÒ´°¿Ú±êÌâ³¤¶È²»Îª0£¬Ôò½«´°¿ÚĞÅÏ¢ÏÔÊ¾µ½½çÃæÖĞ
 		m_buff.push_back(buff);
 	}
 	return TRUE;
@@ -44,9 +44,9 @@ void CMyDialog::InsertList()
 {
 	CRect rc = {};
 	m_objList.GetClientRect(&rc);
-	// é€šè¿‡è°ƒç”¨ InsertColumn å‡½æ•°æ·»åŠ åˆ—
-	m_objList.InsertColumn(0, _T("åºå·"), 0, rc.right / 2);
-	m_objList.InsertColumn(1, _T("çª—å£ä¿¡æ¯"), 0, rc.right / 2);
+	// Í¨¹ıµ÷ÓÃ InsertColumn º¯ÊıÌí¼ÓÁĞ
+	m_objList.InsertColumn(0, _T("ĞòºÅ"), 0, rc.right / 2);
+	m_objList.InsertColumn(1, _T("´°¿ÚĞÅÏ¢"), 0, rc.right / 2);
 	m_objList.SetExtendedStyle(LVS_EX_CHECKBOXES |
 		LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 }
@@ -62,15 +62,15 @@ BEGIN_MESSAGE_MAP(CMyDialog, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CMyDialog æ¶ˆæ¯å¤„ç†ç¨‹åº
+// CMyDialog ÏûÏ¢´¦Àí³ÌĞò
 
 
-//å…¥å£å‡½æ•°
+//Èë¿Úº¯Êı
 BOOL CMyDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–
+	// TODO:  ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯
 	InsertList();
 	//InitListCtrl();
 	SetTimer(
@@ -78,7 +78,7 @@ BOOL CMyDialog::OnInitDialog()
 		500, NULL
 	);
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // å¼‚å¸¸: OCX å±æ€§é¡µåº”è¿”å› FALSE
+				  // Òì³£: OCX ÊôĞÔÒ³Ó¦·µ»Ø FALSE
 }
 
 
@@ -86,21 +86,21 @@ BOOL CMyDialog::OnInitDialog()
 void CMyDialog::OnTimer(UINT_PTR nIDEvent)
 {
 	static int index = 0;
-	// TODO: åœ¨æ­¤æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼
+	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
 	if (nIDEvent == 1)
 	{
 		m_objList.DeleteAllItems();
 		m_buff.clear();
 		EnumWindows(EnumWinProc, 0);
 		CString temp;
-		for (int i = 0; i < m_buff.size(); i++)
+		for (DWORD i = 0; i < m_buff.size(); i++)
 		{
 			if (m_buff[i].GetLength() != 0)
 			{
 				temp.Format(_T("%d"), index);
-				// é€šè¿‡ InsertItem å‡½æ•°æ·»åŠ è¡Œ
+				// Í¨¹ı InsertItem º¯ÊıÌí¼ÓĞĞ
 				m_objList.InsertItem(index, temp);
-				// é€šè¿‡ SetItemText å‡½æ•°ç»™æ¯ä¸€è¡Œè®¾ç½®å†…å®¹
+				// Í¨¹ı SetItemText º¯Êı¸øÃ¿Ò»ĞĞÉèÖÃÄÚÈİ
 				m_objList.SetItemText(index, 1, m_buff[i]);
 				index++;
 			}

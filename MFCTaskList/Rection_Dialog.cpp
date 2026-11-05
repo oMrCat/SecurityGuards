@@ -1,4 +1,4 @@
-ï»¿// Rection_Dialog.cpp: å®ç°æ–‡ä»¶
+// Rection_Dialog.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// Rection_Dialog å¯¹è¯æ¡†
+// Rection_Dialog ¶Ô»°¿ò
 char* R_Buff;
 
 IMPLEMENT_DYNAMIC(Rection_Dialog, CDialogEx)
@@ -35,38 +35,38 @@ BEGIN_MESSAGE_MAP(Rection_Dialog, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// Rection_Dialog æ¶ˆæ¯å¤„ç†ç¨‹åº
+// Rection_Dialog ÏûÏ¢´¦Àí³ÌĞò
 
 
-// RVA è½¬æ¢æˆ FOA 
+// RVA ×ª»»³É FOA 
 DWORD r_rva_to_foa(char* buff, DWORD rva)
 {
-	// å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆ dos å¤´
+	// ÏÈ½«»º³åÇø×ª»»³É dos Í·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	// æ ¹æ® dos å¤´æ‰¾åˆ° n t å¤´
+	// ¸ù¾İ dos Í·ÕÒµ½ n t Í·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
-	// è·å–æ–‡ä»¶å¤´
+	// »ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	// åŒºæ®µçš„æ•°é‡
+	// Çø¶ÎµÄÊıÁ¿
 	DWORD section_count = file_head->NumberOfSections;
-	// è·å–åˆ°åŒºæ®µå¤´è¡¨
+	// »ñÈ¡µ½Çø¶ÎÍ·±í
 	PIMAGE_SECTION_HEADER section_head =
 		IMAGE_FIRST_SECTION(nt_head);
-	for (int i = 0; i < section_count; i++)
+	for (DWORD i = 0; i < section_count; i++)
 	{
-		// å¦‚æœ rva åœ¨æœ¬åŒºæ®µï¼Œå°±è®¡ç®—æ®µå†…åç§»
-		// åŠ ä¸Šæ–‡ä»¶ä¸­çš„åç§»,
-		// ä¸ºä»€ä¹ˆç”¨ å†…å­˜çš„èµ·å§‹åœ°å€ + æ–‡ä»¶å¤§å°ï¼Œ
-		// å› ä¸ºéƒ¨åˆ†æ•°æ®ï¼Œåœ¨æ–‡ä»¶ä¸­æ²¡æœ‰ï¼Œç”¨å†…å­˜å¤§å°è®¡ç®—è¿™ä¸ªèŒƒå›´ï¼Œ
-		// å¯èƒ½å‡ºç°é—®é¢˜
+		// Èç¹û rva ÔÚ±¾Çø¶Î£¬¾Í¼ÆËã¶ÎÄÚÆ«ÒÆ
+		// ¼ÓÉÏÎÄ¼şÖĞµÄÆ«ÒÆ,
+		// ÎªÊ²Ã´ÓÃ ÄÚ´æµÄÆğÊ¼µØÖ· + ÎÄ¼ş´óĞ¡£¬
+		// ÒòÎª²¿·ÖÊı¾İ£¬ÔÚÎÄ¼şÖĞÃ»ÓĞ£¬ÓÃÄÚ´æ´óĞ¡¼ÆËãÕâ¸ö·¶Î§£¬
+		// ¿ÉÄÜ³öÏÖÎÊÌâ
 		if (rva >= section_head->VirtualAddress &&
 			rva <= section_head->VirtualAddress +
 			section_head->SizeOfRawData
 			)
 		{
-			// æ ¹æ®å…¬å¼è®¡ç®— FOA 
-			// RVA - åŒºæ®µèµ·å§‹åœ°å€ = FOA - åŒºæ®µæ–‡ä»¶èµ·å§‹åœ°å€
+			// ¸ù¾İ¹«Ê½¼ÆËã FOA 
+			// RVA - Çø¶ÎÆğÊ¼µØÖ· = FOA - Çø¶ÎÎÄ¼şÆğÊ¼µØÖ·
 			DWORD foa = rva - section_head->VirtualAddress
 				+ section_head->PointerToRawData;
 			return foa;
@@ -77,11 +77,11 @@ DWORD r_rva_to_foa(char* buff, DWORD rva)
 }
 
 typedef struct _TYPEOFFSET {
-	WORD Offset : 12;  // (1) å¤§å°ä¸º12Bitçš„é‡å®šä½åç§»
-	WORD Type : 4;   // (2) å¤§å°ä¸º4Bitçš„é‡å®šä½ä¿¡æ¯ç±»å‹å€¼
+	WORD Offset : 12;  // (1) ´óĞ¡Îª12BitµÄÖØ¶¨Î»Æ«ÒÆ
+	WORD Type : 4;   // (2) ´óĞ¡Îª4BitµÄÖØ¶¨Î»ĞÅÏ¢ÀàĞÍÖµ
 }TYPEOFFSET, * PTYPEOFFSET;
 
-//è§£æé‡å®šä½è¡¨
+//½âÎöÖØ¶¨Î»±í
 void Rection_Dialog::get_relocation_infomation(char* buff)
 {
 	CString Base_Rva;
@@ -90,44 +90,44 @@ void Rection_Dialog::get_relocation_infomation(char* buff)
 	CString FOA;
 	CString r_data;
 	CString split;
-	//å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆdoså¤´
+	//ÏÈ½«»º³åÇø×ª»»³ÉdosÍ·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	//æ ¹æ®doså¤´æ‰¾åˆ°ntå¤´
+	//¸ù¾İdosÍ·ÕÒµ½ntÍ·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
-	//è·å–æ‰©å±•å¤´
+	//»ñÈ¡À©Õ¹Í·
 	PIMAGE_OPTIONAL_HEADER optional_head = &nt_head->OptionalHeader;
 
-	//åœ¨æ•°æ®ç›®å½•è¡¨çš„ç¬¬6é¡¹è·å–èµ„æº
+	//ÔÚÊı¾İÄ¿Â¼±íµÄµÚ6Ïî»ñÈ¡×ÊÔ´
 	DWORD reloc_rva = optional_head->DataDirectory[5].VirtualAddress;
 	DWORD reloc_foa = r_rva_to_foa(buff, reloc_rva);
 
-	// è·å–é‡å®šä½è¡¨çš„ç¬¬ä¸€é¡¹
+	// »ñÈ¡ÖØ¶¨Î»±íµÄµÚÒ»Ïî
 	PIMAGE_BASE_RELOCATION rel =
-		(PIMAGE_BASE_RELOCATION)(reloc_foa + (DWORD)buff);
+		(PIMAGE_BASE_RELOCATION)(buff + reloc_foa);
 
 	while (rel->SizeOfBlock != 0)
 	{
 		DWORD count = (rel->SizeOfBlock - 8) / 2;
 		DWORD base_rva = rel->VirtualAddress;
-		Base_Rva.Format(L"åŸºå€:%08X\r\n", base_rva);
-		Count.Format(L"éœ€è¦é‡å®šä½çš„é¡¹æ•°:%x\r\n",count);
+		Base_Rva.Format(L"»ùÖ·:%08X\r\n", base_rva);
+		Count.Format(L"ĞèÒªÖØ¶¨Î»µÄÏîÊı:%x\r\n",count);
 		Edit_Rection += Base_Rva;
 		Edit_Rection += Count;
 		UpdateData(FALSE);
 		PTYPEOFFSET first_table = (PTYPEOFFSET)(rel + 1);
-		// å¼€å§‹éå†æ¯ä¸€é¡¹
-		for (int i = 0; i < count; i++)
+		// ¿ªÊ¼±éÀúÃ¿Ò»Ïî
+		for (DWORD i = 0; i < count; i++)
 		{
-			// å¦‚æœç±»å‹ä¸º 3 ï¼Œå°±æ˜¯éœ€è¦é‡å®šä½çš„æ•°æ®
+			// Èç¹ûÀàĞÍÎª 3 £¬¾ÍÊÇĞèÒªÖØ¶¨Î»µÄÊı¾İ
 			if (first_table[i].Type == 3)
 			{
-				// è®¡ç®—å‡ºçœŸæ­£éœ€è¦é‡å®šä½çš„æ•°æ® RAV 
+				// ¼ÆËã³öÕæÕıĞèÒªÖØ¶¨Î»µÄÊı¾İ RAV 
 				DWORD real_rva =
 					rel->VirtualAddress + first_table[i].Offset;
 				DWORD real_foa = r_rva_to_foa(buff, real_rva);
 
-				PDWORD data = PDWORD(real_foa + (DWORD)buff);
+				PDWORD data = PDWORD(buff + real_foa);
 
 				Index.Format(L"index:%d\r\n",i);
 				FOA.Format(L"FOA:%X\r\n",real_foa);
@@ -141,8 +141,8 @@ void Rection_Dialog::get_relocation_infomation(char* buff)
 		split.Format(L"------------------------\r\n");
 		Edit_Rection += split;
 		UpdateData(FALSE);
-		// æ‰¾åˆ°ä¸‹ä¸€é¡µ
-		rel = PIMAGE_BASE_RELOCATION((DWORD)rel + rel->SizeOfBlock);
+		// ÕÒµ½ÏÂÒ»Ò³
+		rel = (PIMAGE_BASE_RELOCATION)((char*)rel + rel->SizeOfBlock);
 	}
 
 }

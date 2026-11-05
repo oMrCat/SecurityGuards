@@ -1,4 +1,4 @@
-ï»¿// HeapDialog.cpp: å®ç°æ–‡ä»¶
+// HeapDialog.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -9,7 +9,7 @@
 #include<iostream>
 
 
-// HeapDialog å¯¹è¯æ¡†
+// HeapDialog ¶Ô»°¿ò
 vector<CString>Hp;
 vector<CString>Hp1;
 DWORD dwHeapID;
@@ -37,7 +37,7 @@ BEGIN_MESSAGE_MAP(HeapDialog, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// HeapDialog æ¶ˆæ¯å¤„ç†ç¨‹åº
+// HeapDialog ÏûÏ¢´¦Àí³ÌĞò
 
 BOOL HeapDialog::HeapList(DWORD dwID)
 {
@@ -79,7 +79,7 @@ void HeapDialog::ModuleList()
 {
 	CRect rc = {};
 	m_heaplist.GetClientRect(&rc);
-	// é€šè¿‡è°ƒç”¨ InsertColumn å‡½æ•°æ·»åŠ åˆ—
+	// Í¨¹ıµ÷ÓÃ InsertColumn º¯ÊıÌí¼ÓÁĞ
 	m_heaplist.InsertColumn(0, _T("HeapID"), 0, rc.right / 2);
 	m_heaplist.InsertColumn(1, _T("BlockSize"), 0, rc.right / 2);
 	m_heaplist.SetExtendedStyle(LVS_EX_CHECKBOXES |
@@ -88,14 +88,14 @@ void HeapDialog::ModuleList()
 	{
 		static int index = 0;
 		CString temp2;
-		for (int i = 0; i < Hp.size(); i++)
+		for (DWORD i = 0; i < Hp.size(); i++)
 		{
 			if (Hp[i].GetLength() != 0)
 			{
 				temp2.Format(_T("%d"), Hp[i]);
-				// é€šè¿‡ InsertItem å‡½æ•°æ·»åŠ è¡Œ
+				// Í¨¹ı InsertItem º¯ÊıÌí¼ÓĞĞ
 				m_heaplist.InsertItem(i, temp2);
-				// é€šè¿‡ SetItemText å‡½æ•°ç»™æ¯ä¸€è¡Œè®¾ç½®å†…å®¹
+				// Í¨¹ı SetItemText º¯Êı¸øÃ¿Ò»ĞĞÉèÖÃÄÚÈİ
 				m_heaplist.SetItemText(i, 0, Hp[i]);
 				m_heaplist.SetItemText(i, 1, Hp1[i]);
 				index++;

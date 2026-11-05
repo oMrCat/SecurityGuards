@@ -1,4 +1,4 @@
-ï»¿// CMyTabCtrl.cpp: å®ç°æ–‡ä»¶
+// CMyTabCtrl.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -30,18 +30,18 @@ void CMyTabCtrl::InitTabCtrl(int count, ...)
 		CDialogEx* dlg = va_arg(vl, CDialogEx*);
 		DWORD id = va_arg(vl, DWORD);
 
-		// æ·»åŠ é€‰é¡¹åç§°
+		// Ìí¼ÓÑ¡ÏîÃû³Æ
 		InsertItem(i, name);
-		// åˆ›å»ºçª—å£
+		// ´´½¨´°¿Ú
 		dlg->Create(id, this);
-		// ç§»åŠ¨å­çª—å£
+		// ÒÆ¶¯×Ó´°¿Ú
 		CRect rc = {};
 		GetClientRect(&rc);
 		rc.DeflateRect(1, 26, 1, 1);
 		dlg->MoveWindow(rc);
-		// éšè—çª—å£
+		// Òş²Ø´°¿Ú
 		dlg->ShowWindow(SW_HIDE);
-		// å°†çª—å£æŒ‡é’ˆ push åˆ° vector ä¸­
+		// ½«´°¿ÚÖ¸Õë push µ½ vector ÖĞ
 		m_vecDlg.push_back(dlg);
 	}
 	m_vecDlg[0]->ShowWindow(SW_SHOW);
@@ -54,16 +54,16 @@ END_MESSAGE_MAP()
 
 
 
-// CMyTabCtrl æ¶ˆæ¯å¤„ç†ç¨‹åº
+// CMyTabCtrl ÏûÏ¢´¦Àí³ÌĞò
 
 
 
 
 void CMyTabCtrl::OnTcnSelchange(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	int select = GetCurSel();
-	for (int i = 0; i < m_vecDlg.size(); i++)
+	for (DWORD i = 0; i < m_vecDlg.size(); i++)
 	{
 		if (i == select)
 		{

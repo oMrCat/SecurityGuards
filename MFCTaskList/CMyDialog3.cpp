@@ -1,4 +1,4 @@
-ï»¿// CMyDialog3.cpp: å®ç°æ–‡ä»¶
+// CMyDialog3.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -14,7 +14,7 @@ vector<DWORD>m_pro;
 vector<CString>m_pro1;
 vector<CString>m_pro2;
 
-// CMyDialog3 å¯¹è¯æ¡†
+// CMyDialog3 ¶Ô»°¿ò
 
 IMPLEMENT_DYNAMIC(CMyDialog3, CDialogEx)
 
@@ -45,7 +45,7 @@ BEGIN_MESSAGE_MAP(CMyDialog3, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CMyDialog3 æ¶ˆæ¯å¤„ç†ç¨‹åº
+// CMyDialog3 ÏûÏ¢´¦Àí³ÌĞò
 
 BOOL CMyDialog3::EnumProcess()
 {
@@ -60,21 +60,21 @@ BOOL CMyDialog3::EnumProcess()
 	PROCESSENTRY32 pe = { 0 };
 	pe.dwSize = sizeof(PROCESSENTRY32);
 	hProcessSnapshot = CreateToolhelp32Snapshot(
-		TH32CS_SNAPPROCESS,  //åˆ›å»ºçš„æ˜¯è¿›ç¨‹å¿«ç…§
-		0            //è¿›ç¨‹IDï¼Œåªæœ‰åœ¨åˆ›å»ºæ¨¡å—ï¼Œå †å¿«ç…§çš„æ—¶å€™ï¼ŒæŒ‡å®šè¿›ç¨‹
+		TH32CS_SNAPPROCESS,  //´´½¨µÄÊÇ½ø³Ì¿ìÕÕ
+		0            //½ø³ÌID£¬Ö»ÓĞÔÚ´´½¨Ä£¿é£¬¶Ñ¿ìÕÕµÄÊ±ºò£¬Ö¸¶¨½ø³Ì
 	);
 	if (hProcessSnapshot == INVALID_HANDLE_VALUE)
 	{
 		return 0;
 	}
-	//3. è·å–ç¬¬ä¸€ä¸ªè¿›ç¨‹çš„ä¿¡æ¯ï¼Œå¦‚æœè·å–æˆåŠŸï¼Œå°±å¯ä»¥ç»§ç»­å¾€åè·å–
+	//3. »ñÈ¡µÚÒ»¸ö½ø³ÌµÄĞÅÏ¢£¬Èç¹û»ñÈ¡³É¹¦£¬¾Í¿ÉÒÔ¼ÌĞøÍùºó»ñÈ¡
 	BOOL bSuccess = Process32First(
-		hProcessSnapshot,//å¿«ç…§çš„å¥æŸ„
-		&pe              //ç¬¬ä¸€ä¸ªè¿›ç¨‹çš„ä¿¡æ¯
+		hProcessSnapshot,//¿ìÕÕµÄ¾ä±ú
+		&pe              //µÚÒ»¸ö½ø³ÌµÄĞÅÏ¢
 	);
 	TCHAR szExePath[MAX_PATH] = { 0 };
 	DWORD dwSize = MAX_PATH;
-	//4. å¾ªç¯éå†ï¼Œæ‰€æœ‰çš„è¿›ç¨‹ä¿¡æ¯
+	//4. Ñ­»·±éÀú£¬ËùÓĞµÄ½ø³ÌĞÅÏ¢
 	if (bSuccess == TRUE)
 	{
 		do
@@ -90,7 +90,7 @@ BOOL CMyDialog3::EnumProcess()
 			m_pro2.push_back(pro2);
 		} while (Process32Next(hProcessSnapshot, &pe));
 	}
-	//å…³é—­å¥æŸ„
+	//¹Ø±Õ¾ä±ú
 	CloseHandle(hProcessSnapshot);
 	return 0;
 }
@@ -99,24 +99,24 @@ void CMyDialog3::ProcessList()
 {
 	CRect rc = {};
 	m_proList.GetClientRect(&rc);
-	// é€šè¿‡è°ƒç”¨ InsertColumn å‡½æ•°æ·»åŠ åˆ—
+	// Í¨¹ıµ÷ÓÃ InsertColumn º¯ÊıÌí¼ÓÁĞ
 	m_proList.InsertColumn(0, _T("PID"), 0, rc.right / 3);
-	m_proList.InsertColumn(1, _T("è¿›ç¨‹åç§°"), 0, rc.right / 3);
-	m_proList.InsertColumn(2, _T("è¿›ç¨‹è·¯å¾„"), 0, rc.right / 3);
+	m_proList.InsertColumn(1, _T("½ø³ÌÃû³Æ"), 0, rc.right / 3);
+	m_proList.InsertColumn(2, _T("½ø³ÌÂ·¾¶"), 0, rc.right / 3);
 	m_proList.SetExtendedStyle(LVS_EX_CHECKBOXES |
 		LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 	if (EnumProcess() == 0)
 	{
 		static int index = 0;
 		CString temp2;
-		for (int i = 0; i < m_pro.size(); i++)
+		for (DWORD i = 0; i < m_pro.size(); i++)
 		{
 			if (m_pro1[i].GetLength() != 0)
 			{
 				temp2.Format(_T("%d"), m_pro[i]);
-				// é€šè¿‡ InsertItem å‡½æ•°æ·»åŠ è¡Œ
+				// Í¨¹ı InsertItem º¯ÊıÌí¼ÓĞĞ
 				m_proList.InsertItem(i, temp2);
-				// é€šè¿‡ SetItemText å‡½æ•°ç»™æ¯ä¸€è¡Œè®¾ç½®å†…å®¹
+				// Í¨¹ı SetItemText º¯Êı¸øÃ¿Ò»ĞĞÉèÖÃÄÚÈİ
 				//m_proList.SetItemText(i, 0, m_pro[i]);
 				m_proList.SetItemText(i, 1, m_pro1[i]);
 				m_proList.SetItemText(i, 2, m_pro2[i]);
@@ -131,7 +131,7 @@ BOOL CMyDialog3::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–
+	// TODO:  ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯
 	ProcessList();
 	SetTimer(
 		2,
@@ -139,35 +139,35 @@ BOOL CMyDialog3::OnInitDialog()
 		NULL
 	);
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // å¼‚å¸¸: OCX å±æ€§é¡µåº”è¿”å› FALSE
+				  // Òì³£: OCX ÊôĞÔÒ³Ó¦·µ»Ø FALSE
 }
 
 
 void CMyDialog3::OnTimer(UINT_PTR nIDEvent)
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼
+	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
 	if (nIDEvent == 2)
 	{
 		CRect rc = {};
 		m_proList.GetClientRect(&rc);
-		// é€šè¿‡è°ƒç”¨ InsertColumn å‡½æ•°æ·»åŠ åˆ—
+		// Í¨¹ıµ÷ÓÃ InsertColumn º¯ÊıÌí¼ÓÁĞ
 		m_proList.InsertColumn(0, _T("PID"), 0, rc.right / 3);
-		m_proList.InsertColumn(1, _T("è¿›ç¨‹åç§°"), 0, rc.right / 3);
-		m_proList.InsertColumn(2, _T("è¿›ç¨‹è·¯å¾„"), 0, rc.right / 3);
+		m_proList.InsertColumn(1, _T("½ø³ÌÃû³Æ"), 0, rc.right / 3);
+		m_proList.InsertColumn(2, _T("½ø³ÌÂ·¾¶"), 0, rc.right / 3);
 		m_proList.SetExtendedStyle(LVS_EX_CHECKBOXES |
 			LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 		if (EnumProcess() == 0)
 		{
 			static int index = 0;
 			CString temp;
-			for (int i = 0; i < m_pro.size(); i++)
+			for (DWORD i = 0; i < m_pro.size(); i++)
 			{
 				if (m_pro1[i].GetLength() != 0)
 				{
 					temp.Format(_T("%d"), m_pro[i]);
-					// é€šè¿‡ InsertItem å‡½æ•°æ·»åŠ è¡Œ
+					// Í¨¹ı InsertItem º¯ÊıÌí¼ÓĞĞ
 					m_proList.InsertItem(i, temp);
-					// é€šè¿‡ SetItemText å‡½æ•°ç»™æ¯ä¸€è¡Œè®¾ç½®å†…å®¹
+					// Í¨¹ı SetItemText º¯Êı¸øÃ¿Ò»ĞĞÉèÖÃÄÚÈİ
 					//m_proList.SetItemText(i, 0, m_pro[i]);
 					m_proList.SetItemText(i, 1, m_pro1[i]);
 					m_proList.SetItemText(i, 2, m_pro2[i]);
@@ -186,7 +186,7 @@ void CMyDialog3::OnTimer(UINT_PTR nIDEvent)
 void CMyDialog3::OnRclickList1(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	CMenu menu;
 	menu.LoadMenu(IDR_MENU1);
 	CMenu* pSub = menu.GetSubMenu(0);
@@ -200,7 +200,7 @@ void CMyDialog3::OnRclickList1(NMHDR* pNMHDR, LRESULT* pResult)
 
 void CMyDialog3::OnProcesslist()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
 	//MessageBox(_T("hello"));
 	DWORD dwIndex = m_proList.GetSelectionMark();
 	//::SendMessage(::GetDlgItem(this->GetSafeHwnd(), IDD_DIALOG6),WM_USER+1,NULL,m_pro[dwIndex]);
@@ -213,7 +213,7 @@ void CMyDialog3::OnProcesslist()
 
 void CMyDialog3::OnModul()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
 	DWORD dwIndex = m_proList.GetSelectionMark();
 	//::SendMessage(::GetDlgItem(this->GetSafeHwnd(), IDD_DIALOG6),WM_USER+1,NULL,m_pro[dwIndex]);
 	ModulDialog* mdl = new ModulDialog();
@@ -225,7 +225,7 @@ void CMyDialog3::OnModul()
 
 void CMyDialog3::OnModule()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
 	DWORD dwIndex = m_proList.GetSelectionMark();
 	//::SendMessage(::GetDlgItem(this->GetSafeHwnd(), IDD_DIALOG6),WM_USER+1,NULL,m_pro[dwIndex]);
 	HeapDialog* hdl = new HeapDialog();
@@ -237,15 +237,15 @@ void CMyDialog3::OnModule()
 
 void CMyDialog3::OncloseProcess()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
 	DWORD dwIndex = m_proList.GetSelectionMark();
 	HANDLE hProcess = OpenProcess(
 		PROCESS_ALL_ACCESS,
 		FALSE,
 		m_pro[dwIndex]
 	);
-	//ç»“æŸè¿›ç¨‹
+	//½áÊø½ø³Ì
 	TerminateProcess(hProcess, 0);
-	//å…³é—­å¥æŸ„
+	//¹Ø±Õ¾ä±ú
 	CloseHandle(hProcess);
 }

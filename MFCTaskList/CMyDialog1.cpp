@@ -1,4 +1,4 @@
-ï»¿// CMyDialog1.cpp: å®ç°æ–‡ä»¶
+// CMyDialog1.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// CMyDialog1 å¯¹è¯æ¡†
+// CMyDialog1 ¶Ô»°¿ò
 vector<CString>Fl;
 IMPLEMENT_DYNAMIC(CMyDialog1, CDialogEx)
 
@@ -37,7 +37,7 @@ BEGIN_MESSAGE_MAP(CMyDialog1, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CMyDialog1 æ¶ˆæ¯å¤„ç†ç¨‹åº
+// CMyDialog1 ÏûÏ¢´¦Àí³ÌĞò
 
 void CMyDialog1::OnBnClickedButton1()
 {
@@ -48,17 +48,17 @@ void CMyDialog1::OnBnClickedButton1()
 	fl.Format(L"%s", m_fileedit);
 	if (fl.IsEmpty())
 	{
-		AfxMessageBox(_T("è¯·å…ˆè¾“å…¥è¦æ‰«æçš„ç›®å½•ã€‚"));
+		AfxMessageBox(_T("ÇëÏÈÊäÈëÒªÉ¨ÃèµÄÄ¿Â¼¡£"));
 		return;
 	}
 	if (GetFileAttributes(fl) == INVALID_FILE_ATTRIBUTES)
 	{
-		AfxMessageBox(_T("ç›®å½•ä¸å­˜åœ¨æˆ–æ— æ³•è®¿é—®ã€‚"));
+		AfxMessageBox(_T("Ä¿Â¼²»´æÔÚ»òÎŞ·¨·ÃÎÊ¡£"));
 		return;
 	}
 	GetFilePath(Fl, fl);
 	CString tmpla;
-	for (int i = 0; i < Fl.size(); i++)
+	for (DWORD i = 0; i < Fl.size(); i++)
 	{
 		tmpla.Format(_T("%d"), i);
 		m_filelist.InsertItem(i, tmpla);
@@ -71,32 +71,32 @@ void CMyDialog1::OnBnClickedButton1()
 BOOL CMyDialog1::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
-	// TODO:  åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–
+	// TODO:  ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯
 	CRect rc1 = {};
 	m_filelist.GetClientRect(&rc1);
-	m_filelist.InsertColumn(0, _T("åºå·"), 0, rc1.right / 2);
-	m_filelist.InsertColumn(1, _T("æ–‡ä»¶ä¿¡æ¯"), 0, rc1.right / 2);
+	m_filelist.InsertColumn(0, _T("ĞòºÅ"), 0, rc1.right / 2);
+	m_filelist.InsertColumn(1, _T("ÎÄ¼şĞÅÏ¢"), 0, rc1.right / 2);
 	m_filelist.SetExtendedStyle(LVS_EX_CHECKBOXES |
 		LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // å¼‚å¸¸: OCX å±æ€§é¡µåº”è¿”å› FALSE
+				  // Òì³£: OCX ÊôĞÔÒ³Ó¦·µ»Ø FALSE
 }
 void CMyDialog1::GetFilePath(vector<CString>& vFilePathList, CString strDir)
 {
 	CFileFind finder;
-	BOOL isNotEmpty = finder.FindFile(strDir + _T("*.*"));//æ€»æ–‡ä»¶å¤¹ï¼Œå¼€å§‹éå† 
+	BOOL isNotEmpty = finder.FindFile(strDir + _T("*.*"));//×ÜÎÄ¼ş¼Ğ£¬¿ªÊ¼±éÀú 
 	while (isNotEmpty)
 	{
-		isNotEmpty = finder.FindNextFile();//æŸ¥æ‰¾æ–‡ä»¶ 
-		CString filename = finder.GetFilePath();//è·å–æ–‡ä»¶çš„è·¯å¾„ï¼Œå¯èƒ½æ˜¯æ–‡ä»¶å¤¹ï¼Œå¯èƒ½æ˜¯æ–‡ä»¶ 
+		isNotEmpty = finder.FindNextFile();//²éÕÒÎÄ¼ş 
+		CString filename = finder.GetFilePath();//»ñÈ¡ÎÄ¼şµÄÂ·¾¶£¬¿ÉÄÜÊÇÎÄ¼ş¼Ğ£¬¿ÉÄÜÊÇÎÄ¼ş 
 		if (!(finder.IsDirectory()))
 		{
-			//å¦‚æœæ˜¯æ–‡ä»¶åˆ™åŠ å…¥æ–‡ä»¶åˆ—è¡¨ 
-			vFilePathList.push_back(filename);//å°†ä¸€ä¸ªæ–‡ä»¶è·¯å¾„åŠ å…¥å®¹å™¨ 
+			//Èç¹ûÊÇÎÄ¼şÔò¼ÓÈëÎÄ¼şÁĞ±í 
+			vFilePathList.push_back(filename);//½«Ò»¸öÎÄ¼şÂ·¾¶¼ÓÈëÈİÆ÷ 
 		}
 		else
 		{
-			//é€’å½’éå†ç”¨æˆ·æ–‡ä»¶å¤¹ï¼Œè·³è¿‡éç”¨æˆ·æ–‡ä»¶å¤¹ 
+			//µİ¹é±éÀúÓÃ»§ÎÄ¼ş¼Ğ£¬Ìø¹ı·ÇÓÃ»§ÎÄ¼ş¼Ğ 
 			if (!(finder.IsDots() || finder.IsHidden() || finder.IsSystem() || finder.IsTemporary() || finder.IsReadOnly()))
 			{
 				GetFilePath(vFilePathList, filename + _T("/"));
@@ -107,11 +107,11 @@ void CMyDialog1::GetFilePath(vector<CString>& vFilePathList, CString strDir)
 
 void CMyDialog1::OnBnClickedButton2()
 {
-	if (AfxMessageBox(_T("ä»…ä¼šåˆ é™¤å·²å‹¾é€‰çš„ä¸´æ—¶æ„å»ºæ–‡ä»¶ï¼Œæ˜¯å¦ç»§ç»­ï¼Ÿ"), MB_YESNO | MB_ICONWARNING) != IDYES)
+	if (AfxMessageBox(_T("½ö»áÉ¾³ıÒÑ¹´Ñ¡µÄÁÙÊ±¹¹½¨ÎÄ¼ş£¬ÊÇ·ñ¼ÌĞø£¿"), MB_YESNO | MB_ICONWARNING) != IDYES)
 		return;
 	DWORD removed = 0;
 	DWORD failed = 0;
-	for (int i = 0; i < Fl.size(); i++)
+	for (DWORD i = 0; i < Fl.size(); i++)
 	{
 		if (m_filelist.GetCheck(i) == FALSE)
 			continue;
@@ -127,7 +127,7 @@ void CMyDialog1::OnBnClickedButton2()
 		}
 	}
 	CString result;
-	result.Format(_T("æ¸…ç†å®Œæˆï¼šåˆ é™¤ %u ä¸ªæ–‡ä»¶ï¼Œå¤±è´¥ %u ä¸ªã€‚"), removed, failed);
+	result.Format(_T("ÇåÀíÍê³É£ºÉ¾³ı %u ¸öÎÄ¼ş£¬Ê§°Ü %u ¸ö¡£"), removed, failed);
 	AfxMessageBox(result);
 }
 
@@ -135,6 +135,6 @@ void CMyDialog1::OnBnClickedButton2()
 
 //void CMyDialog1::OnBnClickedButton3()
 //{
-//	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+//	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 //
 //}

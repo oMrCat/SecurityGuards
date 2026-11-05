@@ -1,4 +1,4 @@
-ï»¿// Import_Table_List.cpp: å®ç°æ–‡ä»¶
+// Import_Table_List.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// Import_Table_List å¯¹è¯æ¡†
+// Import_Table_List ¶Ô»°¿ò
 char* Buff;
 
 IMPLEMENT_DYNAMIC(Import_Table_List, CDialogEx)
@@ -35,37 +35,37 @@ BEGIN_MESSAGE_MAP(Import_Table_List, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// Import_Table_List æ¶ˆæ¯å¤„ç†ç¨‹åº
+// Import_Table_List ÏûÏ¢´¦Àí³ÌĞò
 
-// RVA è½¬æ¢æˆ FOA 
+// RVA ×ª»»³É FOA 
 DWORD I_rva_to_foa(char* buff, DWORD rva)
 {
-	// å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆ dos å¤´
+	// ÏÈ½«»º³åÇø×ª»»³É dos Í·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	// æ ¹æ® dos å¤´æ‰¾åˆ° n t å¤´
+	// ¸ù¾İ dos Í·ÕÒµ½ n t Í·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
-	// è·å–æ–‡ä»¶å¤´
+	// »ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	// åŒºæ®µçš„æ•°é‡
+	// Çø¶ÎµÄÊıÁ¿
 	DWORD section_count = file_head->NumberOfSections;
-	// è·å–åˆ°åŒºæ®µå¤´è¡¨
+	// »ñÈ¡µ½Çø¶ÎÍ·±í
 	PIMAGE_SECTION_HEADER section_head =
 		IMAGE_FIRST_SECTION(nt_head);
-	for (int i = 0; i < section_count; i++)
+	for (DWORD i = 0; i < section_count; i++)
 	{
-		// å¦‚æœ rva åœ¨æœ¬åŒºæ®µï¼Œå°±è®¡ç®—æ®µå†…åç§»
-		// åŠ ä¸Šæ–‡ä»¶ä¸­çš„åç§»,
-		// ä¸ºä»€ä¹ˆç”¨ å†…å­˜çš„èµ·å§‹åœ°å€ + æ–‡ä»¶å¤§å°ï¼Œ
-		// å› ä¸ºéƒ¨åˆ†æ•°æ®ï¼Œåœ¨æ–‡ä»¶ä¸­æ²¡æœ‰ï¼Œç”¨å†…å­˜å¤§å°è®¡ç®—è¿™ä¸ªèŒƒå›´ï¼Œ
-		// å¯èƒ½å‡ºç°é—®é¢˜
+		// Èç¹û rva ÔÚ±¾Çø¶Î£¬¾Í¼ÆËã¶ÎÄÚÆ«ÒÆ
+		// ¼ÓÉÏÎÄ¼şÖĞµÄÆ«ÒÆ,
+		// ÎªÊ²Ã´ÓÃ ÄÚ´æµÄÆğÊ¼µØÖ· + ÎÄ¼ş´óĞ¡£¬
+		// ÒòÎª²¿·ÖÊı¾İ£¬ÔÚÎÄ¼şÖĞÃ»ÓĞ£¬ÓÃÄÚ´æ´óĞ¡¼ÆËãÕâ¸ö·¶Î§£¬
+		// ¿ÉÄÜ³öÏÖÎÊÌâ
 		if (rva >= section_head->VirtualAddress &&
 			rva <= section_head->VirtualAddress +
 			section_head->SizeOfRawData
 			)
 		{
-			// æ ¹æ®å…¬å¼è®¡ç®— FOA 
-			// RVA - åŒºæ®µèµ·å§‹åœ°å€ = FOA - åŒºæ®µæ–‡ä»¶èµ·å§‹åœ°å€
+			// ¸ù¾İ¹«Ê½¼ÆËã FOA 
+			// RVA - Çø¶ÎÆğÊ¼µØÖ· = FOA - Çø¶ÎÎÄ¼şÆğÊ¼µØÖ·
 			DWORD foa = rva - section_head->VirtualAddress
 				+ section_head->PointerToRawData;
 			return foa;
@@ -74,24 +74,24 @@ DWORD I_rva_to_foa(char* buff, DWORD rva)
 	}
 	return 0;
 }
-// è§£æå¯¼å…¥è¡¨
+// ½âÎöµ¼Èë±í
 void Import_Table_List::get_import_information(char* import_buff)
 {
-	// å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆ dos å¤´
+	// ÏÈ½«»º³åÇø×ª»»³É dos Í·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)import_buff;
-	// æ ¹æ® dos å¤´æ‰¾åˆ° n t å¤´
+	// ¸ù¾İ dos Í·ÕÒµ½ n t Í·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(import_buff + dos_head->e_lfanew);
-	// è·å–æ–‡ä»¶å¤´
+	// »ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_OPTIONAL_HEADER optional_head = &nt_head->OptionalHeader;
 
-	// å¯¼å‡ºè¡¨åœ¨æ•°æ®ç›®å½•è¡¨çš„ç¬¬ 0 é¡¹
+	// µ¼³ö±íÔÚÊı¾İÄ¿Â¼±íµÄµÚ 0 Ïî
 	DWORD import_rva = optional_head->DataDirectory[1].VirtualAddress;
 	DWORD import_foa = I_rva_to_foa(import_buff, import_rva);
 
-	// è·å–åˆ°å¯¼å‡ºè¡¨çš„æ•°æ®
+	// »ñÈ¡µ½µ¼³ö±íµÄÊı¾İ
 	PIMAGE_IMPORT_DESCRIPTOR import_table =
-		(PIMAGE_IMPORT_DESCRIPTOR)(import_foa + (DWORD)import_buff);
+		(PIMAGE_IMPORT_DESCRIPTOR)(import_buff + import_foa);
 
 	CString Import_Name;
 	CString Hint;
@@ -99,36 +99,36 @@ void Import_Table_List::get_import_information(char* import_buff)
 	CString Ordinal;
 	while (import_table->Name != 0)
 	{
-		// å…ˆè·å–åˆ°å¯¼å…¥æ¨¡å—çš„åç§°
+		// ÏÈ»ñÈ¡µ½µ¼ÈëÄ£¿éµÄÃû³Æ
 		DWORD name_foa = I_rva_to_foa(import_buff, import_table->Name);
-		PCHAR name = (PCHAR)(name_foa + (DWORD)import_buff);
+		PCHAR name = (PCHAR)(import_buff + name_foa);
 		Import_Name.Format(L"Name:%S\r\n", name);
 		Import_List += Import_Name;
 		UpdateData(FALSE);
-		// è·å–åˆ°å¯¼å…¥åœ°å€è¡¨ IMAGE_THUNK_DATA
+		// »ñÈ¡µ½µ¼ÈëµØÖ·±í IMAGE_THUNK_DATA
 		DWORD iat_foa = I_rva_to_foa(import_buff, import_table->FirstThunk);
 		PIMAGE_THUNK_DATA iat =
-			(PIMAGE_THUNK_DATA)(iat_foa + (DWORD)import_buff);
+			(PIMAGE_THUNK_DATA)(import_buff + iat_foa);
 		while (iat->u1.AddressOfData != 0)
 		{
 			BOOL is_only_ordinal = IMAGE_SNAP_BY_ORDINAL(iat->u1.Ordinal);
 			if (!is_only_ordinal)
 			{
-				// å¦åˆ™å°±æ˜¯åç§°å¯¼å…¥
+				// ·ñÔò¾ÍÊÇÃû³Æµ¼Èë
 				DWORD name_table_foa =
-					I_rva_to_foa(import_buff, iat->u1.AddressOfData);
+					I_rva_to_foa(import_buff, (DWORD)iat->u1.AddressOfData);
 				PIMAGE_IMPORT_BY_NAME name_table =
-					(PIMAGE_IMPORT_BY_NAME)(name_table_foa + (DWORD)import_buff);
-				Hint.Format(L"åºå·ï¼š%X\r\n",name_table->Hint);
+					(PIMAGE_IMPORT_BY_NAME)(import_buff + name_table_foa);
+				Hint.Format(L"ĞòºÅ£º%X\r\n",name_table->Hint);
 				Import_List += Hint;
-				Name.Format(L"å‡½æ•°å :%S\r\n",name_table->Name);
+				Name.Format(L"º¯ÊıÃû :%S\r\n",name_table->Name);
 				Import_List += Name;
 				UpdateData(FALSE);
 			}
-			// åˆ¤æ–­æœ€é«˜ä½æ˜¯å¦ä¸º1ï¼Œå¦‚æœä¸º1å°±æ˜¯åºå·å¯¼å…¥
+			// ÅĞ¶Ï×î¸ßÎ»ÊÇ·ñÎª1£¬Èç¹ûÎª1¾ÍÊÇĞòºÅµ¼Èë
 			else
 			{
-				Ordinal.Format(L"å¯¼å…¥åºå·ä¸º %X\r\n",iat->u1.Ordinal & 0x7FFFFFFF);
+				Ordinal.Format(L"µ¼ÈëĞòºÅÎª %X\r\n",iat->u1.Ordinal & 0x7FFFFFFF);
 				UpdateData(FALSE);
 			}
 			iat++;

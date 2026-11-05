@@ -1,4 +1,4 @@
-ï»¿// Unload_Dialog.cpp: å®ç°æ–‡ä»¶
+// Unload_Dialog.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// Unload_Dialog å¯¹è¯æ¡†
+// Unload_Dialog ¶Ô»°¿ò
 char* Ul_Buff;
 IMPLEMENT_DYNAMIC(Unload_Dialog, CDialogEx)
 
@@ -34,37 +34,37 @@ BEGIN_MESSAGE_MAP(Unload_Dialog, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// Unload_Dialog æ¶ˆæ¯å¤„ç†ç¨‹åº
+// Unload_Dialog ÏûÏ¢´¦Àí³ÌĞò
 
 
 DWORD Ul_rva_to_foa(char* buff, DWORD rva)
 {
-	// å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆ dos å¤´
+	// ÏÈ½«»º³åÇø×ª»»³É dos Í·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	// æ ¹æ® dos å¤´æ‰¾åˆ° n t å¤´
+	// ¸ù¾İ dos Í·ÕÒµ½ n t Í·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
-	// è·å–æ–‡ä»¶å¤´
+	// »ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	// åŒºæ®µçš„æ•°é‡
+	// Çø¶ÎµÄÊıÁ¿
 	DWORD section_count = file_head->NumberOfSections;
-	// è·å–åˆ°åŒºæ®µå¤´è¡¨
+	// »ñÈ¡µ½Çø¶ÎÍ·±í
 	PIMAGE_SECTION_HEADER section_head =
 		IMAGE_FIRST_SECTION(nt_head);
-	for (int i = 0; i < section_count; i++)
+	for (DWORD i = 0; i < section_count; i++)
 	{
-		// å¦‚æœ rva åœ¨æœ¬åŒºæ®µï¼Œå°±è®¡ç®—æ®µå†…åç§»
-		// åŠ ä¸Šæ–‡ä»¶ä¸­çš„åç§»,
-		// ä¸ºä»€ä¹ˆç”¨ å†…å­˜çš„èµ·å§‹åœ°å€ + æ–‡ä»¶å¤§å°ï¼Œ
-		// å› ä¸ºéƒ¨åˆ†æ•°æ®ï¼Œåœ¨æ–‡ä»¶ä¸­æ²¡æœ‰ï¼Œç”¨å†…å­˜å¤§å°è®¡ç®—è¿™ä¸ªèŒƒå›´ï¼Œ
-		// å¯èƒ½å‡ºç°é—®é¢˜
+		// Èç¹û rva ÔÚ±¾Çø¶Î£¬¾Í¼ÆËã¶ÎÄÚÆ«ÒÆ
+		// ¼ÓÉÏÎÄ¼şÖĞµÄÆ«ÒÆ,
+		// ÎªÊ²Ã´ÓÃ ÄÚ´æµÄÆğÊ¼µØÖ· + ÎÄ¼ş´óĞ¡£¬
+		// ÒòÎª²¿·ÖÊı¾İ£¬ÔÚÎÄ¼şÖĞÃ»ÓĞ£¬ÓÃÄÚ´æ´óĞ¡¼ÆËãÕâ¸ö·¶Î§£¬
+		// ¿ÉÄÜ³öÏÖÎÊÌâ
 		if (rva >= section_head->VirtualAddress &&
 			rva <= section_head->VirtualAddress +
 			section_head->SizeOfRawData
 			)
 		{
-			// æ ¹æ®å…¬å¼è®¡ç®— FOA 
-			// RVA - åŒºæ®µèµ·å§‹åœ°å€ = FOA - åŒºæ®µæ–‡ä»¶èµ·å§‹åœ°å€
+			// ¸ù¾İ¹«Ê½¼ÆËã FOA 
+			// RVA - Çø¶ÎÆğÊ¼µØÖ· = FOA - Çø¶ÎÎÄ¼şÆğÊ¼µØÖ·
 			DWORD foa = rva - section_head->VirtualAddress
 				+ section_head->PointerToRawData;
 			return foa;
@@ -77,16 +77,16 @@ DWORD Ul_rva_to_foa(char* buff, DWORD rva)
 
 void Unload_Dialog::GetUnloadInfo(char* buff)
 {
-	//å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆdoså¤´
+	//ÏÈ½«»º³åÇø×ª»»³ÉdosÍ·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	//æ ¹æ®doså¤´æ‰¾åˆ°ntå¤´
+	//¸ù¾İdosÍ·ÕÒµ½ntÍ·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
-	//è·å–æ–‡ä»¶å¤´
+	//»ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	//è·å–æ‰©å±•å¤´
+	//»ñÈ¡À©Õ¹Í·
 	PIMAGE_OPTIONAL_HEADER optional_head = &nt_head->OptionalHeader;
-	//è·å–æ•°æ®ç›®å½•è¡¨
+	//»ñÈ¡Êı¾İÄ¿Â¼±í
 	PIMAGE_DATA_DIRECTORY DataDirectory = optional_head->DataDirectory;
 
 	DWORD dwFOA = Ul_rva_to_foa(buff, DataDirectory[IMAGE_DIRECTORY_ENTRY_DELAY_IMPORT].VirtualAddress);

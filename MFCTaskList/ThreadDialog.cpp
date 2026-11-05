@@ -1,4 +1,4 @@
-ï»¿// ThreadDialog.cpp: å®ç°æ–‡ä»¶
+// ThreadDialog.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -6,7 +6,7 @@
 #include "ThreadDialog.h"
 #include "afxdialogex.h"
 
-// ThreadDialog å¯¹è¯æ¡†
+// ThreadDialog ¶Ô»°¿ò
 //CString tmp;
 DWORD dwProcessId;
 vector<DWORD>threa;
@@ -40,17 +40,17 @@ BEGIN_MESSAGE_MAP(ThreadDialog, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// ThreadDialog æ¶ˆæ¯å¤„ç†ç¨‹åº
+// ThreadDialog ÏûÏ¢´¦Àí³ÌĞò
 
 
 BOOL ThreadDialog::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// TODO:  åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–
+	// TODO:  ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯
 	//ThreadList();
 	return TRUE;  // return TRUE unless you set the focus to a control
-				  // å¼‚å¸¸: OCX å±æ€§é¡µåº”è¿”å› FALSE
+				  // Òì³£: OCX ÊôĞÔÒ³Ó¦·µ»Ø FALSE
 }
 
 
@@ -74,19 +74,19 @@ BOOL ThreadDialog::EnumThread()
 	THREADENTRY32 te = { 0 };
 	te.dwSize = sizeof(THREADENTRY32);
 	hThreadSnapshot = CreateToolhelp32Snapshot(
-		TH32CS_SNAPTHREAD,  //åˆ›å»ºçš„æ˜¯çº¿ç¨‹å¿«ç…§
-		dwProcessId            //è¿›ç¨‹IDï¼Œåªæœ‰åœ¨åˆ›å»ºæ¨¡å—ï¼Œå †å¿«ç…§çš„æ—¶å€™ï¼ŒæŒ‡å®šè¿›ç¨‹
+		TH32CS_SNAPTHREAD,  //´´½¨µÄÊÇÏß³Ì¿ìÕÕ
+		dwProcessId            //½ø³ÌID£¬Ö»ÓĞÔÚ´´½¨Ä£¿é£¬¶Ñ¿ìÕÕµÄÊ±ºò£¬Ö¸¶¨½ø³Ì
 	);
 	if (hThreadSnapshot == INVALID_HANDLE_VALUE)
 	{
 		return 0;
 	}
-	//3. è·å–ç¬¬ä¸€ä¸ªçº¿ç¨‹çš„ä¿¡æ¯ï¼Œå¦‚æœè·å–æˆåŠŸï¼Œå°±å¯ä»¥ç»§ç»­å¾€åè·å–
+	//3. »ñÈ¡µÚÒ»¸öÏß³ÌµÄĞÅÏ¢£¬Èç¹û»ñÈ¡³É¹¦£¬¾Í¿ÉÒÔ¼ÌĞøÍùºó»ñÈ¡
 	BOOL bSuccess = Thread32First(
-		hThreadSnapshot,//å¿«ç…§çš„å¥æŸ„
-		&te     //ç¬¬ä¸€ä¸ªè¿›ç¨‹çš„ä¿¡æ¯
+		hThreadSnapshot,//¿ìÕÕµÄ¾ä±ú
+		&te     //µÚÒ»¸ö½ø³ÌµÄĞÅÏ¢
 	);
-	//4. å¾ªç¯éå†ï¼Œæ‰€æœ‰çš„è¿›ç¨‹ä¿¡æ¯
+	//4. Ñ­»·±éÀú£¬ËùÓĞµÄ½ø³ÌĞÅÏ¢
 	if (bSuccess == TRUE)
 	{
 		do
@@ -100,7 +100,7 @@ BOOL ThreadDialog::EnumThread()
 			threa2.push_back(pro2);
 		} while (Thread32Next(hThreadSnapshot, &te));
 	}
-	//å…³é—­å¥æŸ„
+	//¹Ø±Õ¾ä±ú
 	CloseHandle(hThreadSnapshot);
 	return 0;
 }
@@ -108,9 +108,9 @@ void ThreadDialog::ThreadList()
 {
 	CRect rc = {};
 	m_threadlist.GetClientRect(&rc);
-	// é€šè¿‡è°ƒç”¨ InsertColumn å‡½æ•°æ·»åŠ åˆ—
-	m_threadlist.InsertColumn(0, _T("åºå·"), 0, rc.right / 4);
-	m_threadlist.InsertColumn(1, _T("çº¿ç¨‹ID"), 0, rc.right / 4);
+	// Í¨¹ıµ÷ÓÃ InsertColumn º¯ÊıÌí¼ÓÁĞ
+	m_threadlist.InsertColumn(0, _T("ĞòºÅ"), 0, rc.right / 4);
+	m_threadlist.InsertColumn(1, _T("Ïß³ÌID"), 0, rc.right / 4);
 	m_threadlist.InsertColumn(2, _T("tpBasePri"), 0, rc.right / 4);
 	m_threadlist.InsertColumn(3, _T("tpDeltaPri"), 0, rc.right / 4);
 	m_threadlist.SetExtendedStyle(LVS_EX_CHECKBOXES |
@@ -120,15 +120,15 @@ void ThreadDialog::ThreadList()
 		static int index = 0;
 		CString temp2;
 		CString temp3;
-		for (int i = 0; i < threa1.size(); i++)
+		for (DWORD i = 0; i < threa1.size(); i++)
 		{
 			if (threa1[i].GetLength() != 0)
 			{
 				temp2.Format(_T("%d"), threa[i]);
 				temp3.Format(_T("%d"), i);
-				// é€šè¿‡ InsertItem å‡½æ•°æ·»åŠ è¡Œ
+				// Í¨¹ı InsertItem º¯ÊıÌí¼ÓĞĞ
 				m_threadlist.InsertItem(i, temp3);
-				// é€šè¿‡ SetItemText å‡½æ•°ç»™æ¯ä¸€è¡Œè®¾ç½®å†…å®¹
+				// Í¨¹ı SetItemText º¯Êı¸øÃ¿Ò»ĞĞÉèÖÃÄÚÈİ
 				m_threadlist.SetItemText(i, 1, temp2);
 				m_threadlist.SetItemText(i, 2, threa1[i]);
 				m_threadlist.SetItemText(i, 3, threa2[i]);
@@ -142,7 +142,7 @@ void ThreadDialog::ThreadList()
 void ThreadDialog::OnRclickList1(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	CMenu menu;
 	menu.LoadMenu(IDR_MENU2);
 	CMenu* pSub = menu.GetSubMenu(0);
@@ -157,7 +157,7 @@ void ThreadDialog::OnRclickList1(NMHDR* pNMHDR, LRESULT* pResult)
 
 void ThreadDialog::OnSuspendThread()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
 	DWORD dwIndex = m_threadlist.GetSelectionMark();
 	//THREADENTRY32 te = { sizeof(THREADENTRY32) };
 	HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, threa[dwIndex]);
@@ -168,7 +168,7 @@ void ThreadDialog::OnSuspendThread()
 
 void ThreadDialog::OnResumeThread()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
 	DWORD dwIndex = m_threadlist.GetSelectionMark();
 	//THREADENTRY32 te = { sizeof(THREADENTRY32) };
 	HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, threa[dwIndex]);
@@ -179,7 +179,7 @@ void ThreadDialog::OnResumeThread()
 
 void ThreadDialog::OnCloseThread()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
 	DWORD dwIndex = m_threadlist.GetSelectionMark();
 	//THREADENTRY32 te = { sizeof(THREADENTRY32) };
 	HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, threa[dwIndex]);

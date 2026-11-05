@@ -1,4 +1,4 @@
-ï»¿// Export_Table_List.cpp: å®ç°æ–‡ä»¶
+// Export_Table_List.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// Export_Table_List å¯¹è¯æ¡†
+// Export_Table_List ¶Ô»°¿ò
 char* E_Buff;
 IMPLEMENT_DYNAMIC(Export_Table_List, CDialogEx)
 
@@ -34,33 +34,33 @@ BEGIN_MESSAGE_MAP(Export_Table_List, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// Export_Table_List æ¶ˆæ¯å¤„ç†ç¨‹åº
+// Export_Table_List ÏûÏ¢´¦Àí³ÌĞò
 
-// RVA è½¬æ¢æˆ FOA 
+// RVA ×ª»»³É FOA 
 DWORD E_rva_to_foa(char* buff, DWORD rva)
 {
-	// å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆ dos å¤´
+	// ÏÈ½«»º³åÇø×ª»»³É dos Í·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	// æ ¹æ® dos å¤´æ‰¾åˆ° n t å¤´
+	// ¸ù¾İ dos Í·ÕÒµ½ n t Í·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
-	// è·å–æ–‡ä»¶å¤´
+	// »ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	// åŒºæ®µçš„æ•°é‡
+	// Çø¶ÎµÄÊıÁ¿
 	DWORD section_count = file_head->NumberOfSections;
-	// è·å–åˆ°åŒºæ®µå¤´è¡¨
+	// »ñÈ¡µ½Çø¶ÎÍ·±í
 	PIMAGE_SECTION_HEADER section_head =
 		IMAGE_FIRST_SECTION(nt_head);
-	for (int i = 0; i < section_count; i++)
+	for (DWORD i = 0; i < section_count; i++)
 	{
-		// å¦‚æœ rva åœ¨æœ¬åŒºæ®µï¼Œå°±è®¡ç®—æ®µå†…åç§»
+		// Èç¹û rva ÔÚ±¾Çø¶Î£¬¾Í¼ÆËã¶ÎÄÚÆ«ÒÆ
 		if (rva >= section_head->VirtualAddress &&
 			rva <= section_head->VirtualAddress +
 			section_head->SizeOfRawData
 			)
 		{
-			// æ ¹æ®å…¬å¼è®¡ç®— FOA 
-			// RVA - åŒºæ®µèµ·å§‹åœ°å€ = FOA - åŒºæ®µæ–‡ä»¶èµ·å§‹åœ°å€
+			// ¸ù¾İ¹«Ê½¼ÆËã FOA 
+			// RVA - Çø¶ÎÆğÊ¼µØÖ· = FOA - Çø¶ÎÎÄ¼şÆğÊ¼µØÖ·
 			DWORD foa = rva - section_head->VirtualAddress
 				+ section_head->PointerToRawData;
 			return foa;
@@ -71,75 +71,75 @@ DWORD E_rva_to_foa(char* buff, DWORD rva)
 }
 
 
-// è§£æå¯¼å‡ºè¡¨
+// ½âÎöµ¼³ö±í
 void Export_Table_List::get_export_information(char* buff)
 {
 	CString Name,Address,E_Name,Number;
-	// å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆ dos å¤´
+	// ÏÈ½«»º³åÇø×ª»»³É dos Í·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	// æ ¹æ® dos å¤´æ‰¾åˆ° n t å¤´
+	// ¸ù¾İ dos Í·ÕÒµ½ n t Í·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
-	// è·å–æ–‡ä»¶å¤´
+	// »ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_OPTIONAL_HEADER optional_head = &nt_head->OptionalHeader;
 
-	// å¯¼å‡ºè¡¨åœ¨æ•°æ®ç›®å½•è¡¨çš„ç¬¬ 0 é¡¹
+	// µ¼³ö±íÔÚÊı¾İÄ¿Â¼±íµÄµÚ 0 Ïî
 	DWORD export_rva = optional_head->DataDirectory[0].VirtualAddress;
 	DWORD export_foa = E_rva_to_foa(buff, export_rva);
 
-	// è·å–åˆ°å¯¼å‡ºè¡¨çš„æ•°æ®
+	// »ñÈ¡µ½µ¼³ö±íµÄÊı¾İ
 	PIMAGE_EXPORT_DIRECTORY export_table =
-		(PIMAGE_EXPORT_DIRECTORY)(export_foa + (DWORD)buff);
+		(PIMAGE_EXPORT_DIRECTORY)(buff + export_foa);
 
-	// è§£æå†…å®¹
+	// ½âÎöÄÚÈİ
 	DWORD name_foa = E_rva_to_foa(buff, export_table->Name);
-	PCHAR name = (PCHAR)(name_foa + (DWORD)buff);
-	Name.Format(L"å¯¼å‡ºæ¨¡å—çš„åç§°ï¼š%S\r\n", name);
+	PCHAR name = (PCHAR)(buff + name_foa);
+	Name.Format(L"µ¼³öÄ£¿éµÄÃû³Æ£º%S\r\n", name);
 	Edit_Export += Name;
 	UpdateData(FALSE);
-	// è·å–åˆ°åºå·çš„åŸºå€
+	// »ñÈ¡µ½ĞòºÅµÄ»ùÖ·
 	DWORD base = export_table->Base;
-	// è·å–åˆ°ä¸¤å¼ è¡¨çš„æ•°é‡
+	// »ñÈ¡µ½Á½ÕÅ±íµÄÊıÁ¿
 	DWORD address_count = export_table->NumberOfFunctions;
 	DWORD name_count = export_table->NumberOfNames;
-	// éå†ä¸‰å¼ è¡¨ï¼Œè·å–æ•°æ®ï¼Œå¦‚æœå“ªå¼ è¡¨æ²¡æœ‰å†…å®¹äº†ä»£è¡¨éå†å®Œæˆï¼Ÿ
-	// ã€åœ°å€è¡¨ã€‘ï¼Œåç§°è¡¨ï¼Œåç§°åºå·è¡¨
-	// å¾—åˆ°å‡½æ•°åœ°å€è¡¨
+	// ±éÀúÈıÕÅ±í£¬»ñÈ¡Êı¾İ£¬Èç¹ûÄÄÕÅ±íÃ»ÓĞÄÚÈİÁË´ú±í±éÀúÍê³É£¿
+	// ¡¾µØÖ·±í¡¿£¬Ãû³Æ±í£¬Ãû³ÆĞòºÅ±í
+	// µÃµ½º¯ÊıµØÖ·±í
 	DWORD func_table_rva = export_table->AddressOfFunctions;
 	DWORD func_table_foa = E_rva_to_foa(buff, func_table_rva);
-	PDWORD func_table = PDWORD(func_table_foa + DWORD(buff));
-	// å¾—åˆ°å‡½æ•°åç§°è¡¨
+	PDWORD func_table = PDWORD(buff + func_table_foa);
+	// µÃµ½º¯ÊıÃû³Æ±í
 	DWORD name_table_rva = export_table->AddressOfNames;
 	DWORD name_table_foa = E_rva_to_foa(buff, name_table_rva);
-	PDWORD name_table = PDWORD(name_table_foa + DWORD(buff));
-	// å¾—åˆ°åç§°åºå·è¡¨// æˆ‘ä»¬å¯ä»¥è‡ªå·±å®ç° GetProcAddress è¿™ä¸ªå‡½æ•°
+	PDWORD name_table = PDWORD(buff + name_table_foa);
+	// µÃµ½Ãû³ÆĞòºÅ±í// ÎÒÃÇ¿ÉÒÔ×Ô¼ºÊµÏÖ GetProcAddress Õâ¸öº¯Êı
 	DWORD ordinal_table_rva = export_table->AddressOfNameOrdinals;
 	DWORD ordinal_table_foa = E_rva_to_foa(buff, ordinal_table_rva);
-	PWORD ordinal_table = PWORD(ordinal_table_foa + DWORD(buff));
+	PWORD ordinal_table = PWORD(buff + ordinal_table_foa);
 
-	// å¼€å§‹éå†,å› ä¸ºåœ°å€è¡¨ä¸­çš„å†…å®¹å¤šï¼Œæ‰€ä»¥ç”¨ä»–éå†
-	for (int i = 0; i < address_count; i++)
+	// ¿ªÊ¼±éÀú,ÒòÎªµØÖ·±íÖĞµÄÄÚÈİ¶à£¬ËùÒÔÓÃËû±éÀú
+	for (DWORD i = 0; i < address_count; i++)
 	{
 		if (func_table[i] == 0)
 		{
-			// å¦‚æœåœ°å€è¡¨çš„å†…å®¹ä¸º 0 å°±æ˜¯æ— æ•ˆå‡½æ•°
+			// Èç¹ûµØÖ·±íµÄÄÚÈİÎª 0 ¾ÍÊÇÎŞĞ§º¯Êı
 			continue;
 		}
-		// åˆ¤æ–­å‡½æ•°æ˜¯å¦åœ¨åç§°è¡¨ä¸­ï¼Œå¦‚æœåœ¨å°±æ˜¯åç§°å¯¼å‡ºï¼Œå¦åˆ™å°±æ˜¯åºå·å¯¼å‡º
-		// æ ‡å¿—ä½ï¼Œå¦‚æœä¸ºå‡ï¼Œå°±è¯´æ˜ä¸åœ¨åç§°è¡¨ä¸­
+		// ÅĞ¶Ïº¯ÊıÊÇ·ñÔÚÃû³Æ±íÖĞ£¬Èç¹ûÔÚ¾ÍÊÇÃû³Æµ¼³ö£¬·ñÔò¾ÍÊÇĞòºÅµ¼³ö
+		// ±êÖ¾Î»£¬Èç¹ûÎª¼Ù£¬¾ÍËµÃ÷²»ÔÚÃû³Æ±íÖĞ
 		bool is_find = false;
-		for (int j = 0; j < name_count; j++)
+		for (DWORD j = 0; j < name_count; j++)
 		{
-			// i æ˜¯ä» 0 å¼€å§‹éå†ï¼Œåºå·è¡¨ä¹Ÿå°±ä¸éœ€è¦åŠ  base äº†
-			// å¦‚æœåœ°å€è¡¨çš„ç´¢å¼•å’Œåç§°åºå·è¡¨çš„å†…å®¹ä¸€è‡´ï¼Œå°±è¯´æ˜åç§°å¯¼å‡º
-			if (i == ordinal_table[j])
+			// i ÊÇ´Ó 0 ¿ªÊ¼±éÀú£¬ĞòºÅ±íÒ²¾Í²»ĞèÒª¼Ó base ÁË
+			// Èç¹ûµØÖ·±íµÄË÷ÒıºÍÃû³ÆĞòºÅ±íµÄÄÚÈİÒ»ÖÂ£¬¾ÍËµÃ÷Ãû³Æµ¼³ö
+			if (i == (DWORD)ordinal_table[j])
 			{
 				is_find = true;
 				PCHAR fun_name =
-					(PCHAR)(E_rva_to_foa(buff, name_table[j]) + (DWORD)buff);
-				Address.Format(L"å‡½æ•°åœ°å€: %p\r\n",func_table[i]);
-				E_Name.Format(L"å‡½æ•°åç§°: %S\r\n",fun_name);
-				Number.Format(L"åç§°åºå·: %d\r\n",ordinal_table[j] + base);
+					(PCHAR)(buff + E_rva_to_foa(buff, name_table[j]));
+				Address.Format(L"º¯ÊıµØÖ·: %p\r\n",func_table[i]);
+				E_Name.Format(L"º¯ÊıÃû³Æ: %S\r\n",fun_name);
+				Number.Format(L"Ãû³ÆĞòºÅ: %d\r\n",ordinal_table[j] + base);
 				Edit_Export += Address;
 				Edit_Export += E_Name;
 				Edit_Export += Number;
@@ -149,9 +149,9 @@ void Export_Table_List::get_export_information(char* buff)
 		}
 		if (is_find == false)
 		{
-			Address.Format(L"å‡½æ•°åœ°å€: %p\r\n", func_table[i]);
-			E_Name.Format(L"å‡½æ•°åç§°: NULL\r\n");
-			Number.Format(L"å‡½æ•°åºå·: %d\r\n", i + base);
+			Address.Format(L"º¯ÊıµØÖ·: %p\r\n", func_table[i]);
+			E_Name.Format(L"º¯ÊıÃû³Æ: NULL\r\n");
+			Number.Format(L"º¯ÊıĞòºÅ: %d\r\n", i + base);
 			Edit_Export += Address;
 			Edit_Export += E_Name;
 			Edit_Export += Number;

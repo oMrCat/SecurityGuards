@@ -1,4 +1,4 @@
-ï»¿// LOAD_PE_Ps.cpp: å®ç°æ–‡ä»¶
+// LOAD_PE_Ps.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -13,7 +13,7 @@
 #include"Unload_Dialog.h"
 
 
-// LOAD_PE_Ps å¯¹è¯æ¡†
+// LOAD_PE_Ps ¶Ô»°¿ò
 CString PE_Ps;
 char* buff;
 IMPLEMENT_DYNAMIC(LOAD_PE_Ps, CDialogEx)
@@ -60,7 +60,7 @@ ON_BN_CLICKED(IDC_BUTTON8, &LOAD_PE_Ps::OnBnClickedButton8)
 END_MESSAGE_MAP()
 
 
-// LOAD_PE_Ps æ¶ˆæ¯å¤„ç†ç¨‹åº
+// LOAD_PE_Ps ÏûÏ¢´¦Àí³ÌĞò
 
 
 afx_msg LRESULT LOAD_PE_Ps::OnUser(WPARAM wParam, LPARAM lParam)
@@ -71,18 +71,18 @@ afx_msg LRESULT LOAD_PE_Ps::OnUser(WPARAM wParam, LPARAM lParam)
 }
 
 
-// è§£ææ–‡ä»¶å¤´
+// ½âÎöÎÄ¼şÍ·
 void LOAD_PE_Ps::get_file_header_information(char* buff)
 {
-	// å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆ dos å¤´
+	// ÏÈ½«»º³åÇø×ª»»³É dos Í·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	// æ ¹æ® dos å¤´æ‰¾åˆ° n t å¤´
+	// ¸ù¾İ dos Í·ÕÒµ½ n t Í·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
 
-	// è·å–æ–‡ä»¶å¤´
+	// »ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	// è·å–æ‰©å±•å¤´
+	// »ñÈ¡À©Õ¹Í·
 	PIMAGE_OPTIONAL_HEADER optional_head = &nt_head->OptionalHeader;
 
 	CString file_head_NumberOfSection;
@@ -98,36 +98,36 @@ void LOAD_PE_Ps::get_file_header_information(char* buff)
 	CString SizeOfHeaders;
 	CString NumberOfRvaAndSizes;
 
-	//åŒºæ®µæ•°é‡
+	//Çø¶ÎÊıÁ¿
 	file_head_NumberOfSection.Format(L"NumberOfSections:%d\r\n", file_head->NumberOfSections);
-	//è¿è¡Œå¹³å°
+	//ÔËĞĞÆ½Ì¨
 	Machine.Format(L"Machine:%x\r\n", file_head->Machine);
-	//æ‰©å±•å¤´çš„å¤§å°
+	//À©Õ¹Í·µÄ´óĞ¡
 	SizeOfOptionalHeader.Format(L"SizeOfOptionalHeader:%x\r\n", file_head->SizeOfOptionalHeader);
 	// EP
-	AddressOfEntryPoint.Format(L"AddressOfEntryPointï¼š%x\r\n", optional_head->AddressOfEntryPoint);
-	//ä»£ç åŒºå—çš„èµ·å§‹RVA
-	BaseOfCode.Format(L"BaseOfCodeï¼š%x\r\n", optional_head->BaseOfCode);
-	//æ•°æ®åŒºå—çš„èµ·å§‹RVAï¼ˆBaseOfData ä»…å­˜åœ¨äº PE32 çš„ OptionalHeaderï¼ŒPE32+ æ²¡æœ‰è¯¥å­—æ®µï¼‰
+	AddressOfEntryPoint.Format(L"AddressOfEntryPoint£º%x\r\n", optional_head->AddressOfEntryPoint);
+	//´úÂëÇø¿éµÄÆğÊ¼RVA
+	BaseOfCode.Format(L"BaseOfCode£º%x\r\n", optional_head->BaseOfCode);
+	//Êı¾İÇø¿éµÄÆğÊ¼RVA£¨BaseOfData ½ö´æÔÚÓÚ PE32 µÄ OptionalHeader£¬PE32+ Ã»ÓĞ¸Ã×Ö¶Î£©
 	if (optional_head->Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
 		PIMAGE_OPTIONAL_HEADER32 optional_head32 = reinterpret_cast<PIMAGE_OPTIONAL_HEADER32>(optional_head);
-		BaseOfData.Format(L"BaseOfDataï¼š%x\r\n", optional_head32->BaseOfData);
+		BaseOfData.Format(L"BaseOfData£º%x\r\n", optional_head32->BaseOfData);
 	}
 	else {
-		BaseOfData.Format(L"BaseOfDataï¼šN/A(PE32+)\r\n");
+		BaseOfData.Format(L"BaseOfData£ºN/A(PE32+)\r\n");
 	}
-	//é•œåƒåŸºå€
-	ImageBase.Format(L"ImageBaseï¼š%x\r\n", optional_head->ImageBase);
-	//å†…å­˜çš„å¯¹é½ç²’åº¦
-	SectionAlignment.Format(L"SectionAlignmentï¼š%x\r\n", optional_head->SectionAlignment);
-	//æ–‡ä»¶çš„å¯¹é½ç²’åº¦
-	FileAlignment.Format(L"FileAlignmentï¼š%x\r\n", optional_head->FileAlignment);
-	//æ˜ åƒè£…å…¥å†…å­˜åçš„æ€»å¤§å°
-	SizeOfImage.Format(L"SizeOfImageï¼š%x\r\n", optional_head->SizeOfImage);
-	//ä»DOSå¤´éƒ¨+PEå¤´éƒ¨+åŒºå—è¡¨çš„æ€»å¤§å°
-	SizeOfHeaders.Format(L"SizeOfHeadersï¼š%x\r\n", optional_head->SizeOfHeaders);
-	//æ•°æ®ç›®å½•è¡¨çš„ä¸ªæ•°
-	NumberOfRvaAndSizes.Format(L"NumberOfRvaAndSizesï¼š%x\r\n", optional_head->NumberOfRvaAndSizes);
+	//¾µÏñ»ùÖ·
+	ImageBase.Format(L"ImageBase£º%x\r\n", optional_head->ImageBase);
+	//ÄÚ´æµÄ¶ÔÆëÁ£¶È
+	SectionAlignment.Format(L"SectionAlignment£º%x\r\n", optional_head->SectionAlignment);
+	//ÎÄ¼şµÄ¶ÔÆëÁ£¶È
+	FileAlignment.Format(L"FileAlignment£º%x\r\n", optional_head->FileAlignment);
+	//Ó³Ïñ×°ÈëÄÚ´æºóµÄ×Ü´óĞ¡
+	SizeOfImage.Format(L"SizeOfImage£º%x\r\n", optional_head->SizeOfImage);
+	//´ÓDOSÍ·²¿+PEÍ·²¿+Çø¿é±íµÄ×Ü´óĞ¡
+	SizeOfHeaders.Format(L"SizeOfHeaders£º%x\r\n", optional_head->SizeOfHeaders);
+	//Êı¾İÄ¿Â¼±íµÄ¸öÊı
+	NumberOfRvaAndSizes.Format(L"NumberOfRvaAndSizes£º%x\r\n", optional_head->NumberOfRvaAndSizes);
 
 	edit_Fileheader += Machine;
 	edit_Fileheader += file_head_NumberOfSection;
@@ -141,13 +141,13 @@ void LOAD_PE_Ps::get_file_header_information(char* buff)
 	edit_Fileheader += SizeOfImage;
 	edit_Fileheader += SizeOfHeaders;
 	edit_Fileheader += NumberOfRvaAndSizes;
-	// æ•°æ®ç›®å½•è¡¨ä¿¡æ¯è¾“å‡º
+	// Êı¾İÄ¿Â¼±íĞÅÏ¢Êä³ö
 	CString Data_Info;
-	Data_Info.Format(L"æ•°æ®ç›®å½•è¡¨ä¿¡æ¯è¾“å‡ºï¼š\r\n");
+	Data_Info.Format(L"Êı¾İÄ¿Â¼±íĞÅÏ¢Êä³ö£º\r\n");
 	edit_Fileheader += Data_Info;
 	CString VirtulaAddress;
 	CString VirtualSize;
-	for (int i = 0; i < optional_head->NumberOfRvaAndSizes; i++)
+	for (DWORD i = 0; i < optional_head->NumberOfRvaAndSizes; i++)
 	{
 		VirtulaAddress.Format(L"VirtulaAddress : %08X\r\n",
 			optional_head->DataDirectory[i].VirtualAddress);
@@ -156,66 +156,66 @@ void LOAD_PE_Ps::get_file_header_information(char* buff)
 		edit_Fileheader += VirtulaAddress;
 		edit_Fileheader += VirtualSize;
 	}
-	//åŒºæ®µçš„æ•°é‡
+	//Çø¶ÎµÄÊıÁ¿
 	DWORD section_count = file_head->NumberOfSections;
-	//ç¬¬ä¸€ä¸ªåŒºæ®µçš„ä½ç½®
+	//µÚÒ»¸öÇø¶ÎµÄÎ»ÖÃ
 	PIMAGE_SECTION_HEADER section_head = IMAGE_FIRST_SECTION(nt_head);
 	CString Section_Info,Section_Name, Section_VirtualAddress, Section_VirtualSize,
 		Section_PointerToRawData, Section_SizeOfRawData;
-	Section_Info.Format(L"åŒºæ®µè¡¨çš„ä¿¡æ¯è¾“å‡ºï¼š\r\n");
+	Section_Info.Format(L"Çø¶Î±íµÄĞÅÏ¢Êä³ö£º\r\n");
 	edit_Fileheader += Section_Info;
-	for (int i = 0; i < section_count; i++)
+	for (DWORD i = 0; i < section_count; i++)
 	{
-		Section_Name.Format(L"Section_Nameï¼š%S \r\n", section_head->Name);
-		Section_VirtualAddress.Format(L"Section_VirtualAddress ï¼š%08X\r\n",section_head->VirtualAddress);
-		Section_VirtualSize.Format(L"Section_VirtualSize\%08X\r\n",section_head->Misc.VirtualSize);
-		Section_PointerToRawData.Format(L"Section_PointerToRawData ï¼š%08X\r\n",section_head->PointerToRawData);
-		Section_SizeOfRawData.Format(L"Section_SizeOfRawData\%08X\r\n",section_head->SizeOfRawData);
+		Section_Name.Format(L"Section_Name£º%S \r\n", section_head->Name);
+		Section_VirtualAddress.Format(L"Section_VirtualAddress £º%08X\r\n",section_head->VirtualAddress);
+		Section_VirtualSize.Format(L"Section_VirtualSize£º%08X\r\n",section_head->Misc.VirtualSize);
+		Section_PointerToRawData.Format(L"Section_PointerToRawData £º%08X\r\n",section_head->PointerToRawData);
+		Section_SizeOfRawData.Format(L"Section_SizeOfRawData£º%08X\r\n",section_head->SizeOfRawData);
 
 		edit_Fileheader += Section_Name;
 		edit_Fileheader += Section_VirtualAddress;
 		edit_Fileheader += Section_VirtualSize;
 		edit_Fileheader += Section_PointerToRawData;
 		edit_Fileheader += Section_SizeOfRawData;
-		// æŒ‡å‘ä¸‹ä¸€ä¸ªåŒºæ®µå¤´
+		// Ö¸ÏòÏÂÒ»¸öÇø¶ÎÍ·
 		section_head++;
 	}
 	UpdateData(FALSE);
 }
 
-//RVAè½¬æ¢æˆVAã€FOA
+//RVA×ª»»³ÉVA¡¢FOA
 void LOAD_PE_Ps::rva_to_vafoa(char* buff)
 {
 	UpdateData(TRUE);
-	//å°†ç¼–è¾‘æ¡†å†…çš„CStringå€¼è½¬æˆ16è¿›åˆ¶
+	//½«±à¼­¿òÄÚµÄCStringÖµ×ª³É16½øÖÆ
 	DWORD rva = _tcstoul(Edit_Rva, NULL, 16);
-	//å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆDOSå¤´
+	//ÏÈ½«»º³åÇø×ª»»³ÉDOSÍ·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	//æ ¹æ®doså¤´æ‰¾åˆ°ntå¤´
+	//¸ù¾İdosÍ·ÕÒµ½ntÍ·
 	PIMAGE_NT_HEADERS nt_head = (PIMAGE_NT_HEADERS)(buff + dos_head->e_lfanew);
-	//è·å–æ–‡ä»¶å¤´
+	//»ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	//è·å–æ‰©å±•å¤´
+	//»ñÈ¡À©Õ¹Í·
 	PIMAGE_OPTIONAL_HEADER option_head = &nt_head->OptionalHeader;
-	//åŒºæ®µçš„æ•°é‡
+	//Çø¶ÎµÄÊıÁ¿
 	DWORD section_count = file_head->NumberOfSections;
-	//è·å–åˆ°åŒºæ®µå¤´è¡¨
+	//»ñÈ¡µ½Çø¶ÎÍ·±í
 	PIMAGE_SECTION_HEADER section_head = IMAGE_FIRST_SECTION(nt_head);
-	for (int i = 0; i < section_count; i++)
+	for (DWORD i = 0; i < section_count; i++)
 	{
-		//å¦‚æœrvaåœ¨æœ¬åŒºæ®µï¼Œå°±è®¡ç®—æ®µå†…åç§»
+		//Èç¹ûrvaÔÚ±¾Çø¶Î£¬¾Í¼ÆËã¶ÎÄÚÆ«ÒÆ
 		if (rva >= section_head->VirtualAddress&&
 			rva<=section_head->VirtualAddress+section_head->SizeOfRawData)
 		{
-			//æ ¹æ®å…¬å¼è®¡ç®—  FOA
-			//RVA-åŒºæ®µèµ·å§‹ä½ç½®=FOA-åŒºæ®µæ–‡ä»¶èµ·å§‹åœ°å€
+			//¸ù¾İ¹«Ê½¼ÆËã  FOA
+			//RVA-Çø¶ÎÆğÊ¼Î»ÖÃ=FOA-Çø¶ÎÎÄ¼şÆğÊ¼µØÖ·
 			DWORD foa = rva - section_head->VirtualAddress
 				+ section_head->PointerToRawData;
 			CString Foa;
 			Foa.Format(L"%x", foa);
 			Edit_Foa = Foa;
-			//va è™šæ‹Ÿåœ°å€= InmageBase(åŠ è½½åŸºå€) + RVA(ç›¸å¯¹è™šæ‹Ÿåœ°å€)
-			DWORD va = option_head->ImageBase + rva;
+			//va ĞéÄâµØÖ·= InmageBase(¼ÓÔØ»ùÖ·) + RVA(Ïà¶ÔĞéÄâµØÖ·)
+			DWORD va = (DWORD)(option_head->ImageBase + rva);
 			CString Va;
 			Va.Format(L"%x", va);
 			Edit_Va = Va;
@@ -225,38 +225,38 @@ void LOAD_PE_Ps::rva_to_vafoa(char* buff)
 	}
 	return;
 }
-//VAè½¬æ¢æˆRVAã€FOA
+//VA×ª»»³ÉRVA¡¢FOA
 void LOAD_PE_Ps::va_to_rvafoa(char* buff)
 {
 	UpdateData(TRUE);
-	//å°†ç¼–è¾‘æ¡†å†…çš„CStringå€¼è½¬æˆ16è¿›åˆ¶
+	//½«±à¼­¿òÄÚµÄCStringÖµ×ª³É16½øÖÆ
 	DWORD va = _tcstoul(Edit_Va, NULL, 16);
-	//å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆDOSå¤´
+	//ÏÈ½«»º³åÇø×ª»»³ÉDOSÍ·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	//æ ¹æ®doså¤´æ‰¾åˆ°ntå¤´
+	//¸ù¾İdosÍ·ÕÒµ½ntÍ·
 	PIMAGE_NT_HEADERS nt_head = (PIMAGE_NT_HEADERS)(buff + dos_head->e_lfanew);
-	//è·å–æ–‡ä»¶å¤´
+	//»ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	//è·å–æ‰©å±•å¤´
+	//»ñÈ¡À©Õ¹Í·
 	PIMAGE_OPTIONAL_HEADER option_head = &nt_head->OptionalHeader;
-	//åŒºæ®µçš„æ•°é‡
+	//Çø¶ÎµÄÊıÁ¿
 	DWORD section_count = file_head->NumberOfSections;
-	//è·å–åˆ°åŒºæ®µå¤´è¡¨
+	//»ñÈ¡µ½Çø¶ÎÍ·±í
 	PIMAGE_SECTION_HEADER section_head = IMAGE_FIRST_SECTION(nt_head);
-	//è·å–Rva
-	DWORD Rva = va - option_head->ImageBase;
+	//»ñÈ¡Rva
+	DWORD Rva = va - (DWORD)option_head->ImageBase;
 	CString rva;
 	rva.Format(L"%x", Rva);
 	Edit_Rva = rva;
 	UpdateData(FALSE);
-	for (int i = 0; i < section_count; i++)
+	for (DWORD i = 0; i < section_count; i++)
 	{
-		//å¦‚æœrvaåœ¨æœ¬åŒºæ®µï¼Œå°±è®¡ç®—æ®µå†…åç§»
+		//Èç¹ûrvaÔÚ±¾Çø¶Î£¬¾Í¼ÆËã¶ÎÄÚÆ«ÒÆ
 		if (Rva >= section_head->VirtualAddress &&
 			Rva <= section_head->VirtualAddress + section_head->SizeOfRawData)
 		{
-			//æ ¹æ®å…¬å¼è®¡ç®—  FOA
-			//RVA-åŒºæ®µèµ·å§‹ä½ç½®=FOA-åŒºæ®µæ–‡ä»¶èµ·å§‹åœ°å€
+			//¸ù¾İ¹«Ê½¼ÆËã  FOA
+			//RVA-Çø¶ÎÆğÊ¼Î»ÖÃ=FOA-Çø¶ÎÎÄ¼şÆğÊ¼µØÖ·
 			DWORD foa = Rva - section_head->VirtualAddress
 				+ section_head->PointerToRawData;
 			CString Foa;
@@ -268,23 +268,23 @@ void LOAD_PE_Ps::va_to_rvafoa(char* buff)
 	}
 	return;
 }
-//FOAè½¬æ¢æˆRVAã€VA
+//FOA×ª»»³ÉRVA¡¢VA
 void LOAD_PE_Ps::foa_to_rvava(char* buff)
 {
 	UpdateData(TRUE);
-	//å°†ç¼–è¾‘æ¡†å†…çš„CStringå€¼è½¬æˆ16è¿›åˆ¶
+	//½«±à¼­¿òÄÚµÄCStringÖµ×ª³É16½øÖÆ
 	DWORD foa = _tcstoul(Edit_Foa, NULL, 16);
-	//å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆDOSå¤´
+	//ÏÈ½«»º³åÇø×ª»»³ÉDOSÍ·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	//æ ¹æ®doså¤´æ‰¾åˆ°ntå¤´
+	//¸ù¾İdosÍ·ÕÒµ½ntÍ·
 	PIMAGE_NT_HEADERS nt_head = (PIMAGE_NT_HEADERS)(buff + dos_head->e_lfanew);
-	//è·å–æ–‡ä»¶å¤´
+	//»ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	//è·å–æ‰©å±•å¤´
+	//»ñÈ¡À©Õ¹Í·
 	PIMAGE_OPTIONAL_HEADER option_head = &nt_head->OptionalHeader;
-	//åŒºæ®µçš„æ•°é‡
+	//Çø¶ÎµÄÊıÁ¿
 	DWORD section_count = file_head->NumberOfSections;
-	//è·å–åˆ°åŒºæ®µå¤´è¡¨
+	//»ñÈ¡µ½Çø¶ÎÍ·±í
 	PIMAGE_SECTION_HEADER section_head = IMAGE_FIRST_SECTION(nt_head);
 
 	if (foa < nt_head->OptionalHeader.SizeOfHeaders)
@@ -294,19 +294,19 @@ void LOAD_PE_Ps::foa_to_rvava(char* buff)
 		Edit_Rva = cd;
 		UpdateData(FALSE);
 	}
-	//å¾ªç¯åˆ¤æ–­FOAè½åœ¨äº†å“ªä¸ªåŒºæ®µä¸­
-	for (int i = 0; i < section_count; i++)
+	//Ñ­»·ÅĞ¶ÏFOAÂäÔÚÁËÄÄ¸öÇø¶ÎÖĞ
+	for (DWORD i = 0; i < section_count; i++)
 	{
 		DWORD dwSectionRva = section_head[i].VirtualAddress;
 		DWORD dwSectionEndRva = dwSectionRva + section_head[i].SizeOfRawData;
 		DWORD dwSectionFoa = section_head[i].PointerToRawData;
-		//FOA=RVA - RVAåŒºæ®µ +FOAåŒºæ®µ
+		//FOA=RVA - RVAÇø¶Î +FOAÇø¶Î
 		DWORD Rva = foa + dwSectionRva - dwSectionFoa;
 		CString rva;
 		rva.Format(L"%x", Rva);
 		Edit_Rva = rva;
-		//VAè™šæ‹Ÿåœ°å€=ImageBase(åŠ è½½åŸºå€)+RVAï¼ˆç›¸å¯¹è™šæ‹Ÿåœ°å€ï¼‰
-		DWORD Va = option_head->ImageBase + Rva;
+		//VAĞéÄâµØÖ·=ImageBase(¼ÓÔØ»ùÖ·)+RVA£¨Ïà¶ÔĞéÄâµØÖ·£©
+		DWORD Va = (DWORD)(option_head->ImageBase + Rva);
 		CString va;
 		va.Format(L"%x", Va);
 		Edit_Va = va;
@@ -318,7 +318,7 @@ void LOAD_PE_Ps::foa_to_rvava(char* buff)
 //RVA
 void LOAD_PE_Ps::OnBnClickedButton2()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	Edit_Control_Foa.SetReadOnly(TRUE);
 	Edit_Control_Va.SetReadOnly(TRUE);
 	Edit_Control_Rva.SetReadOnly(FALSE);
@@ -328,7 +328,7 @@ void LOAD_PE_Ps::OnBnClickedButton2()
 //VA
 void LOAD_PE_Ps::OnBnClickedButton1()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	Edit_Control_Foa.SetReadOnly(TRUE);
 	Edit_Control_Rva.SetReadOnly(TRUE);
 	Edit_Control_Va.SetReadOnly(FALSE);
@@ -339,67 +339,67 @@ void LOAD_PE_Ps::OnBnClickedButton1()
 //FOA
 void LOAD_PE_Ps::OnBnClickedButton3()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	Edit_Control_Va.SetReadOnly(TRUE);
 	Edit_Control_Rva.SetReadOnly(TRUE);
 	Edit_Control_Foa.SetReadOnly(FALSE);
 	foa_to_rvava(buff);
 }
 
-//å¯¼å…¥è¡¨
+//µ¼Èë±í
 void LOAD_PE_Ps::OnBnClickedButton6()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	Import_Table_List* import_table = new Import_Table_List;
 	import_table->Create(IDD_DIALOG12, this);
 	import_table->SendMessage(WM_USER + 5, NULL, (LPARAM)buff);
 	import_table->ShowWindow(SW_SHOW);
 }
 
-//å¯¼å‡ºè¡¨
+//µ¼³ö±í
 void LOAD_PE_Ps::OnBnClickedButton7()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	Export_Table_List* export_table = new Export_Table_List;
 	export_table->Create(IDD_DIALOG13, this);
 	export_table->SendMessage(WM_USER + 6, NULL, (LPARAM)buff);
 	export_table->ShowWindow(SW_SHOW);
 }
 
-//é‡å®šä½è¡¨
+//ÖØ¶¨Î»±í
 void LOAD_PE_Ps::OnBnClickedButton5()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	Rection_Dialog* rection = new Rection_Dialog;
 	rection->Create(IDD_DIALOG14, this);
 	rection->SendMessage(WM_USER + 7, NULL, (LPARAM)buff);
 	rection->ShowWindow(SW_SHOW);
 }
 
-//èµ„æºè¡¨
+//×ÊÔ´±í
 void LOAD_PE_Ps::OnBnClickedButton9()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	Resource_Dialog* resource = new Resource_Dialog;
 	resource->Create(IDD_DIALOG15, this);
 	resource->SendMessage(WM_USER + 8, NULL, (LPARAM)buff);
 	resource->ShowWindow(SW_SHOW);
 }
 
-//TLSè¡¨
+//TLS±í
 void LOAD_PE_Ps::OnBnClickedButton10()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	TLS_Dialog* tls = new TLS_Dialog;
 	tls->Create(IDD_DIALOG16, this);
 	tls->SendMessage(WM_USER + 9, NULL, (LPARAM)buff);
 	tls->ShowWindow(SW_SHOW);
 }
 
-//å»¶è¿Ÿè¡¨
+//ÑÓ³Ù±í
 void LOAD_PE_Ps::OnBnClickedButton8()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	Unload_Dialog* unload = new Unload_Dialog;
 	unload->Create(IDD_DIALOG17, this);
 	unload->SendMessage(WM_USER + 10, NULL, (LPARAM)buff);

@@ -1,4 +1,4 @@
-ï»¿// Resource_Dialog.cpp: å®ç°æ–‡ä»¶
+// Resource_Dialog.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -7,7 +7,7 @@
 #include "afxdialogex.h"
 
 
-// Resource_Dialog å¯¹è¯æ¡†
+// Resource_Dialog ¶Ô»°¿ò
 char* Re_Buff;
 IMPLEMENT_DYNAMIC(Resource_Dialog, CDialogEx)
 
@@ -34,37 +34,37 @@ BEGIN_MESSAGE_MAP(Resource_Dialog, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// Resource_Dialog æ¶ˆæ¯å¤„ç†ç¨‹åº
+// Resource_Dialog ÏûÏ¢´¦Àí³ÌĞò
 
-// RVA è½¬æ¢æˆ FOA 
+// RVA ×ª»»³É FOA 
 DWORD re_rva_to_foa(char* buff, DWORD rva)
 {
-	// å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆ dos å¤´
+	// ÏÈ½«»º³åÇø×ª»»³É dos Í·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	// æ ¹æ® dos å¤´æ‰¾åˆ° n t å¤´
+	// ¸ù¾İ dos Í·ÕÒµ½ n t Í·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
-	// è·å–æ–‡ä»¶å¤´
+	// »ñÈ¡ÎÄ¼şÍ·
 	PIMAGE_FILE_HEADER file_head = &nt_head->FileHeader;
-	// åŒºæ®µçš„æ•°é‡
+	// Çø¶ÎµÄÊıÁ¿
 	DWORD section_count = file_head->NumberOfSections;
-	// è·å–åˆ°åŒºæ®µå¤´è¡¨
+	// »ñÈ¡µ½Çø¶ÎÍ·±í
 	PIMAGE_SECTION_HEADER section_head =
 		IMAGE_FIRST_SECTION(nt_head);
-	for (int i = 0; i < section_count; i++)
+	for (DWORD i = 0; i < section_count; i++)
 	{
-		// å¦‚æœ rva åœ¨æœ¬åŒºæ®µï¼Œå°±è®¡ç®—æ®µå†…åç§»
-		// åŠ ä¸Šæ–‡ä»¶ä¸­çš„åç§»,
-		// ä¸ºä»€ä¹ˆç”¨ å†…å­˜çš„èµ·å§‹åœ°å€ + æ–‡ä»¶å¤§å°ï¼Œ
-		// å› ä¸ºéƒ¨åˆ†æ•°æ®ï¼Œåœ¨æ–‡ä»¶ä¸­æ²¡æœ‰ï¼Œç”¨å†…å­˜å¤§å°è®¡ç®—è¿™ä¸ªèŒƒå›´ï¼Œ
-		// å¯èƒ½å‡ºç°é—®é¢˜
+		// Èç¹û rva ÔÚ±¾Çø¶Î£¬¾Í¼ÆËã¶ÎÄÚÆ«ÒÆ
+		// ¼ÓÉÏÎÄ¼şÖĞµÄÆ«ÒÆ,
+		// ÎªÊ²Ã´ÓÃ ÄÚ´æµÄÆğÊ¼µØÖ· + ÎÄ¼ş´óĞ¡£¬
+		// ÒòÎª²¿·ÖÊı¾İ£¬ÔÚÎÄ¼şÖĞÃ»ÓĞ£¬ÓÃÄÚ´æ´óĞ¡¼ÆËãÕâ¸ö·¶Î§£¬
+		// ¿ÉÄÜ³öÏÖÎÊÌâ
 		if (rva >= section_head->VirtualAddress &&
 			rva <= section_head->VirtualAddress +
 			section_head->SizeOfRawData
 			)
 		{
-			// æ ¹æ®å…¬å¼è®¡ç®— FOA 
-			// RVA - åŒºæ®µèµ·å§‹åœ°å€ = FOA - åŒºæ®µæ–‡ä»¶èµ·å§‹åœ°å€
+			// ¸ù¾İ¹«Ê½¼ÆËã FOA 
+			// RVA - Çø¶ÎÆğÊ¼µØÖ· = FOA - Çø¶ÎÎÄ¼şÆğÊ¼µØÖ·
 			DWORD foa = rva - section_head->VirtualAddress
 				+ section_head->PointerToRawData;
 			return foa;
@@ -74,7 +74,7 @@ DWORD re_rva_to_foa(char* buff, DWORD rva)
 	return 0;
 }
 
-//è§£æèµ„æºè¡¨
+//½âÎö×ÊÔ´±í
 void Resource_Dialog::get_resource_infomation(char* buff)
 {
 	CString Id;
@@ -82,37 +82,37 @@ void Resource_Dialog::get_resource_infomation(char* buff)
 	CString OnceId;
 	CString OffsetToData;
 	CString DataSize;
-	//å…ˆå°†ç¼“å†²åŒºè½¬æ¢æˆdoså¤´
+	//ÏÈ½«»º³åÇø×ª»»³ÉdosÍ·
 	PIMAGE_DOS_HEADER dos_head = (PIMAGE_DOS_HEADER)buff;
-	//æ ¹æ®doså¤´æ‰¾åˆ°ntå¤´
+	//¸ù¾İdosÍ·ÕÒµ½ntÍ·
 	PIMAGE_NT_HEADERS nt_head =
 		PIMAGE_NT_HEADERS(buff + dos_head->e_lfanew);
-	//è·å–æ‰©å±•å¤´
+	//»ñÈ¡À©Õ¹Í·
 	PIMAGE_OPTIONAL_HEADER optional_head = &nt_head->OptionalHeader;
 
-	//åœ¨æ•°æ®ç›®å½•è¡¨çš„ç¬¬3é¡¹è·å–èµ„æº
+	//ÔÚÊı¾İÄ¿Â¼±íµÄµÚ3Ïî»ñÈ¡×ÊÔ´
 	DWORD resource_rva = optional_head->DataDirectory[2].VirtualAddress;
 	DWORD resource_foa = re_rva_to_foa(buff, resource_rva);
 
-	// èµ„æºè¡¨çš„åŸºå€
-	DWORD res_base = resource_foa + (DWORD)buff;
+	// ×ÊÔ´±íµÄ»ùÖ·
+	char* res_base = buff + resource_foa;
 	PIMAGE_RESOURCE_DIRECTORY res_table =
 		(PIMAGE_RESOURCE_DIRECTORY)res_base;
 
-	// èµ„æºçš„ç§ç±»
+	// ×ÊÔ´µÄÖÖÀà
 	DWORD name_count = res_table->NumberOfNamedEntries;
 	DWORD id_count = res_table->NumberOfIdEntries;
 	DWORD count = name_count + id_count;
 
-	// ç¬¬ä¸€å±‚éå† entry
+	// µÚÒ»²ã±éÀú entry
 	PIMAGE_RESOURCE_DIRECTORY_ENTRY first_table =
 		(PIMAGE_RESOURCE_DIRECTORY_ENTRY)(res_table + 1);
-	for (int i = 0; i < count; i++)
+	for (DWORD i = 0; i < count; i++)
 	{
-		// åˆ¤æ–­æ˜¯å­—ç¬¦ä¸²èµ„æºè¿˜æ˜¯idèµ„æº
+		// ÅĞ¶ÏÊÇ×Ö·û´®×ÊÔ´»¹ÊÇid×ÊÔ´
 		if (first_table->NameIsString != 1)
 		{
-			// è¿™é‡Œæ˜¯ ID èµ„æº
+			// ÕâÀïÊÇ ID ×ÊÔ´
 			switch (first_table->Id)
 			{
 			case 0x1:Id.Format(L"Cursor\r\n"); break;
@@ -137,7 +137,7 @@ void Resource_Dialog::get_resource_infomation(char* buff)
 		}
 		else
 		{
-			// å­—ç¬¦ä¸²èµ„æº
+			// ×Ö·û´®×ÊÔ´
 			PIMAGE_RESOURCE_DIR_STRING_U name_string =
 				(PIMAGE_RESOURCE_DIR_STRING_U)(res_base + first_table->NameOffset);
 			NameString.Format(L"%S\r\n", name_string->NameString);
@@ -145,30 +145,30 @@ void Resource_Dialog::get_resource_infomation(char* buff)
 			UpdateData(FALSE);
 		}
 
-		// åˆ¤æ–­ä¸‹ä¸€å±‚æ˜¯å¦æ˜¯ä¸€ä¸ªç›®å½•
+		// ÅĞ¶ÏÏÂÒ»²ãÊÇ·ñÊÇÒ»¸öÄ¿Â¼
 		if (first_table->DataIsDirectory == 1)
 		{
-			// è·å–ç¬¬äºŒå±‚çš„ä¿¡æ¯
+			// »ñÈ¡µÚ¶ş²ãµÄĞÅÏ¢
 			PIMAGE_RESOURCE_DIRECTORY second =
 				(PIMAGE_RESOURCE_DIRECTORY)(first_table->OffsetToDirectory + res_base);
-			// è·å–æŸä¸€ç§èµ„æºçš„ä¸ªæ•°
+			// »ñÈ¡Ä³Ò»ÖÖ×ÊÔ´µÄ¸öÊı
 			DWORD res_count = second->NumberOfNamedEntries + second->NumberOfIdEntries;
 
-			// å…ˆè·å–åˆ°åé¢è·Ÿ entry
+			// ÏÈ»ñÈ¡µ½ºóÃæ¸ú entry
 			PIMAGE_RESOURCE_DIRECTORY_ENTRY second_table =
 				(PIMAGE_RESOURCE_DIRECTORY_ENTRY)(second + 1);
 
-			// å¼€å§‹éå†ç¬¬äºŒå±‚çš„æ•°æ®
-			for (int j = 0; j < res_count; j++)
+			// ¿ªÊ¼±éÀúµÚ¶ş²ãµÄÊı¾İ
+			for (DWORD j = 0; j < res_count; j++)
 			{
-				// è¿™é‡Œæ˜¯æŸç§èµ„æºçš„ID
+				// ÕâÀïÊÇÄ³ÖÖ×ÊÔ´µÄID
 				if (second_table->NameIsString != 1)
 				{
-					OnceId.Format(L"èµ„æºID:%x\r\n", second_table->Id);
+					OnceId.Format(L"×ÊÔ´ID:%x\r\n", second_table->Id);
 					Edit_Resource += OnceId;
 					UpdateData(FALSE);
 				}
-				// å¯»æ‰¾ç¬¬ä¸‰å±‚èµ„æº
+				// Ñ°ÕÒµÚÈı²ã×ÊÔ´
 				if (second_table->DataIsDirectory == 1)
 				{
 					PIMAGE_RESOURCE_DIRECTORY third =
@@ -179,8 +179,8 @@ void Resource_Dialog::get_resource_infomation(char* buff)
 					PIMAGE_RESOURCE_DATA_ENTRY data =
 						(PIMAGE_RESOURCE_DATA_ENTRY)(third_table->OffsetToData + res_base);
 
-					OffsetToData.Format(L"èµ„æºçš„æ•°æ®RVA:0x%08X\r\n",data->OffsetToData);
-					DataSize.Format(L"èµ„æºçš„æ•°æ®å¤§å°:%x\r\n", data->Size);
+					OffsetToData.Format(L"×ÊÔ´µÄÊı¾İRVA:0x%08X\r\n",data->OffsetToData);
+					DataSize.Format(L"×ÊÔ´µÄÊı¾İ´óĞ¡:%x\r\n", data->Size);
 					Edit_Resource += OffsetToData;
 					Edit_Resource += DataSize;
 					UpdateData(FALSE);

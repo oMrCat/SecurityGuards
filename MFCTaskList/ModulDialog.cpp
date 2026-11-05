@@ -1,4 +1,4 @@
-ï»¿// ModulDialog.cpp: å®ç°æ–‡ä»¶
+// ModulDialog.cpp: ÊµÏÖÎÄ¼ş
 //
 
 #include "pch.h"
@@ -11,7 +11,7 @@
 vector<CString>Mo;
 vector<CString>Mo1;
 vector<CString>Mo2;
-// ModulDialog å¯¹è¯æ¡†
+// ModulDialog ¶Ô»°¿ò
 DWORD dwModulId;
 IMPLEMENT_DYNAMIC(ModulDialog, CDialogEx)
 
@@ -37,7 +37,7 @@ BEGIN_MESSAGE_MAP(ModulDialog, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// ModulDialog æ¶ˆæ¯å¤„ç†ç¨‹åº
+// ModulDialog ÏûÏ¢´¦Àí³ÌĞò
 
 
 afx_msg LRESULT ModulDialog::OnUser_Modul(WPARAM wParam, LPARAM lParam)
@@ -60,19 +60,19 @@ BOOL ModulDialog::EnumModule()
 	MODULEENTRY32 me = { 0 };
 	me.dwSize = sizeof(MODULEENTRY32);
 	hModulSnapshot = CreateToolhelp32Snapshot(
-		TH32CS_SNAPMODULE,  //åˆ›å»ºçš„æ˜¯çº¿ç¨‹å¿«ç…§
-		dwModulId            //è¿›ç¨‹IDï¼Œåªæœ‰åœ¨åˆ›å»ºæ¨¡å—ï¼Œå †å¿«ç…§çš„æ—¶å€™ï¼ŒæŒ‡å®šè¿›ç¨‹
+		TH32CS_SNAPMODULE,  //´´½¨µÄÊÇÏß³Ì¿ìÕÕ
+		dwModulId            //½ø³ÌID£¬Ö»ÓĞÔÚ´´½¨Ä£¿é£¬¶Ñ¿ìÕÕµÄÊ±ºò£¬Ö¸¶¨½ø³Ì
 	);
 	if (hModulSnapshot == INVALID_HANDLE_VALUE)
 	{
 		return 0;
 	}
-	//3. è·å–ç¬¬ä¸€ä¸ªçº¿ç¨‹çš„ä¿¡æ¯ï¼Œå¦‚æœè·å–æˆåŠŸï¼Œå°±å¯ä»¥ç»§ç»­å¾€åè·å–
+	//3. »ñÈ¡µÚÒ»¸öÏß³ÌµÄĞÅÏ¢£¬Èç¹û»ñÈ¡³É¹¦£¬¾Í¿ÉÒÔ¼ÌĞøÍùºó»ñÈ¡
 	BOOL bSuccess = Module32First(
-		hModulSnapshot,//å¿«ç…§çš„å¥æŸ„
-		&me     //ç¬¬ä¸€ä¸ªè¿›ç¨‹çš„ä¿¡æ¯
+		hModulSnapshot,//¿ìÕÕµÄ¾ä±ú
+		&me     //µÚÒ»¸ö½ø³ÌµÄĞÅÏ¢
 	);
-	//4. å¾ªç¯éå†ï¼Œæ‰€æœ‰çš„è¿›ç¨‹ä¿¡æ¯
+	//4. Ñ­»·±éÀú£¬ËùÓĞµÄ½ø³ÌĞÅÏ¢
 	if (bSuccess == TRUE)
 	{
 		do
@@ -86,7 +86,7 @@ BOOL ModulDialog::EnumModule()
 			Mo2.push_back(mo2);
 		} while (Module32Next(hModulSnapshot,&me));
 	}
-	//å…³é—­å¥æŸ„
+	//¹Ø±Õ¾ä±ú
 	CloseHandle(hModulSnapshot);
 	return 0;
 }
@@ -94,8 +94,8 @@ void ModulDialog::ModuleList()
 {
 	CRect rc = {};
 	m_modullist.GetClientRect(&rc);
-	// é€šè¿‡è°ƒç”¨ InsertColumn å‡½æ•°æ·»åŠ åˆ—
-	m_modullist.InsertColumn(0, _T("æ¨¡å—ID"), 0, rc.right / 3);
+	// Í¨¹ıµ÷ÓÃ InsertColumn º¯ÊıÌí¼ÓÁĞ
+	m_modullist.InsertColumn(0, _T("Ä£¿éID"), 0, rc.right / 3);
 	m_modullist.InsertColumn(1, _T("Module"), 0, rc.right / 3);
 	m_modullist.InsertColumn(2, _T("szExePath"), 0, rc.right / 3);
 	m_modullist.SetExtendedStyle(LVS_EX_CHECKBOXES |
@@ -104,14 +104,14 @@ void ModulDialog::ModuleList()
 	{
 		static int index = 0;
 		CString temp2;
-		for (int i = 0; i < Mo.size(); i++)
+		for (DWORD i = 0; i < Mo.size(); i++)
 		{
 			if (Mo[i].GetLength() != 0)
 			{
 				temp2.Format(_T("%d"), Mo[i]);
-				// é€šè¿‡ InsertItem å‡½æ•°æ·»åŠ è¡Œ
+				// Í¨¹ı InsertItem º¯ÊıÌí¼ÓĞĞ
 				m_modullist.InsertItem(i, temp2);
-				// é€šè¿‡ SetItemText å‡½æ•°ç»™æ¯ä¸€è¡Œè®¾ç½®å†…å®¹
+				// Í¨¹ı SetItemText º¯Êı¸øÃ¿Ò»ĞĞÉèÖÃÄÚÈİ
 				m_modullist.SetItemText(i, 0, Mo[i]);
 				m_modullist.SetItemText(i, 1, Mo1[i]);
 				m_modullist.SetItemText(i, 2, Mo2[i]);
