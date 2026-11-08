@@ -20,20 +20,24 @@ CString GetVirusDatabasePath()
 	TCHAR modulePath[MAX_PATH] = {};
 	GetModuleFileName(NULL, modulePath, MAX_PATH);
 	CString path(modulePath);
-	int separator = path.ReverseFind(_T('\\'));
-	if (separator >= 0)
+	// 从 exe 所在目录逐级向上查找 LocalVirBase\Vir.ini，
+	// 兼容 x64\Release 等多层构建输出目录（原来只回退一级，
+	// 导致从构建目录运行时本地病毒库永远加载失败）。
+	for (int level = 0; level < 5 && !path.IsEmpty(); level++)
+	{
+		int separator = path.ReverseFind(_T('\\'));
+		if (separator < 0)
+			break;
 		path = path.Left(separator + 1);
-	CString database = path + _T("LocalVirBase\\Vir.ini");
-	if (GetFileAttributes(database) != INVALID_FILE_ATTRIBUTES)
-		return database;
-
-	// Visual Studio 的默认输出目录位于项目根目录的 Debug/Release 子目录。
-	if (!path.IsEmpty() && path[path.GetLength() - 1] == _T('\\'))
-		path = path.Left(path.GetLength() - 1);
-	separator = path.ReverseFind(_T('\\'));
-	if (separator >= 0)
-		return path.Left(separator + 1) + _T("LocalVirBase\\Vir.ini");
-	return database;
+		CString database = path + _T("LocalVirBase\\Vir.ini");
+		if (GetFileAttributes(database) != INVALID_FILE_ATTRIBUTES)
+			return database;
+		path = path.Left(separator);
+		if (path.GetLength() <= 3) // 已到盘根（如 C:\）
+			break;
+	}
+	// 兜底：相对工作目录（VS 调试时 CWD 为项目目录，恰好命中）
+	return _T("LocalVirBase\\Vir.ini");
 }
 }
 
